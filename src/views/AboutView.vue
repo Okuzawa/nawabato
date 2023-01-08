@@ -1,9 +1,9 @@
 <template>
+  <card-list />
   <div class="about">
     <div id="app">
       <label>名前</label>
       <input type="text" v-model="userName" />
-
       <label>メッセージ</label>
       <input type="text" v-model="message" />
       <button @click="sendMessage">送信</button>
