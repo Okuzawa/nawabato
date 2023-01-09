@@ -1,30 +1,65 @@
 <template>
   <div class="CardItem">
-      <button class="card-item btn btn-secondary">
-        <canvas></canvas>
-        <p class="ttl"><font size=auto>{{name}}</font></p>
-        <div>
-          <p><font size="7">{{count}}</font></p>
-        </div>
-        <div>
-          <font size="4">
-            <p>消費SP</p>
-            <p>{{cost}}</p>
-          </font>
-        </div>
-      </button>
+    <button class="card-item btn btn-secondary">
+      <canvas ref="cardCanvas"></canvas>
+      <p class="name">{{ name }}</p>
+      <div class="count">
+        <p>{{ count }}</p>
+      </div>
+      <div>
+        <p class="sp">消費SP</p>
+        <p class="cost">{{ cost }}</p>
+      </div>
+    </button>
   </div>
 </template>
 
 <script>
+import src_frame from "../assets/blocks/frame.png";
+import src_yellow_block from "../assets/blocks/yellow_block.png";
+import src_orange_block from "../assets/blocks/orange_block.png";
+
 export default {
-  name: 'cardItem',
+  name: "CardItem",
   props: {
     name: String,
     count: Number,
-    cost: Number
-  }
-}
+    cost: Number,
+    map: Array
+  },
+  data() {
+    return {};
+  },
+  mounted() {
+    this.ctx = this.$refs.cardCanvas.getContext("2d");
+    this.imageDraw(this.map);
+  },
+  methods: {
+    imageDraw: function (map) {
+      let index = 0;
+      let image = new Image();
+      for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+          switch (map[index]) {
+            case 0:
+              image.src = src_frame;
+              break;
+            case 1:
+              image.src = src_yellow_block;
+              break;
+            case 2:
+              image.src = src_orange_block;
+              break;
+            default:
+              break;
+          }
+          this.ctx.drawImage(image, x * 38, y * 19, 38, 19);
+          index++;
+        }
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -38,13 +73,21 @@ export default {
   height: 130px;
   margin: 0px -10px;
 }
-.card-item .ttl {
+.card-item .name {
+  font-size: auto;
   line-height: 1;
 }
-.card-item p {
-  line-height: 0.6;
+.card-item .count {
+  font-size: 300%;
+}
+.card-item .sp {
+  font-size: 100%;
+}
+.card-item .cost {
+  font-size: 150%;
 }
 .card-item div {
   display: inline-block;
+  line-height: 0.6;
 }
 </style>

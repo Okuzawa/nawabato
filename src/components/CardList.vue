@@ -2,14 +2,18 @@
   <div class="CardList">
     <div class="container">
       <div v-for="(value, key, index) in cardList" v-bind:key="index">
-        <CardItem :name="value.name" :count="value.count" :cost="value.cost" />
+        <CardItem :name="value.name" :count="value.count" :cost="value.cost" :map="value.map"/>
       </div>
+      <!--<CardItem :name="hoge" :count="10" :cost="3" :map="[0,0,0,1,1,1,0,0,0,0]"/>-->
     </div>
   </div>
 </template>
 
 <script>
 import CardItem from "@/components/CardItem.vue";
+/*import src_frame from "../assets/blocks/frame.png";
+import yellow_block from "../assets/blocks/yellow_block.png";
+import orange_block from "../assets/blocks/orange_block.png";*/
 
 export default {
   name: "CardListView",
@@ -18,11 +22,12 @@ export default {
   },
   data() {
     return {
-      cardList: [],
+      cardList: []
     };
   },
   created: function () {
-    var api_url = "https://script.google.com/macros/s/AKfycbx1KFHoEykkjIe3Rn3LVo6_kLglJmK_KZE8uNbwfkgv3lrCQ6p3-JhFI2uADL8GcHdQ/exec";
+    var api_url =
+      "https://script.google.com/macros/s/AKfycbx1KFHoEykkjIe3Rn3LVo6_kLglJmK_KZE8uNbwfkgv3lrCQ6p3-JhFI2uADL8GcHdQ/exec";
 
     let cardList = this.cardList;
 
@@ -32,10 +37,12 @@ export default {
       })
       .then(function (json) {
         for (var i in json) {
+          //console.log(i,json[i].map);
           cardList.push({
-            name:json[i].name,
-            count:json[i].count,
-            cost:json[i].cost,
+            name: json[i].name,
+            count: json[i].count,
+            cost: json[i].cost,
+            map: JSON.parse("[" + json[i].map + "]"),
           });
         }
       });
