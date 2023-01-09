@@ -25,10 +25,12 @@ export default {
     name: String,
     count: Number,
     cost: Number,
-    map: Array
+    map: Array,
   },
   data() {
-    return {};
+    return {
+      ctx:null,
+    };
   },
   mounted() {
     this.ctx = this.$refs.cardCanvas.getContext("2d");
@@ -37,9 +39,9 @@ export default {
   methods: {
     imageDraw: function (map) {
       let index = 0;
-      let image = new Image();
       for (let y = 0; y < 8; y++) {
         for (let x = 0; x < 8; x++) {
+          let image = new Image();
           switch (map[index]) {
             case 0:
               image.src = src_frame;
@@ -53,7 +55,9 @@ export default {
             default:
               break;
           }
-          this.ctx.drawImage(image, x * 38, y * 19, 38, 19);
+          image.onload = () => {
+            this.ctx.drawImage(image, x * 38, y * 19, 38, 19);
+          };
           index++;
         }
       }

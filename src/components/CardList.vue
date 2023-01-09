@@ -11,9 +11,6 @@
 
 <script>
 import CardItem from "@/components/CardItem.vue";
-/*import src_frame from "../assets/blocks/frame.png";
-import yellow_block from "../assets/blocks/yellow_block.png";
-import orange_block from "../assets/blocks/orange_block.png";*/
 
 export default {
   name: "CardListView",
@@ -37,7 +34,7 @@ export default {
       })
       .then(function (json) {
         for (var i in json) {
-          //console.log(i,json[i].map);
+          //console.log(json[i].map);
           cardList.push({
             name: json[i].name,
             count: json[i].count,
