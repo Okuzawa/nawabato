@@ -1,8 +1,7 @@
 <template>
   <div class="post">
     <HelloWorld msg="ぽすと"/>
-    <card-list />
-    <button class="btn btn-primary">bootstrap-btn</button>
+    <div class="wrap"><card-list/></div>
   </div>
 </template>
 
@@ -19,5 +18,9 @@ export default {
 </script>
 
 <style>
-
+.wrap {
+  margin-top: -150px;
+  margin-left: 100px;
+  transform: scale(0.5, 0.5);
+}
 </style>

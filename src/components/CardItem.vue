@@ -16,8 +16,6 @@
 
 <script>
 import src_frame from "../assets/blocks/frame.png";
-import src_yellow_block from "../assets/blocks/yellow_block.png";
-import src_orange_block from "../assets/blocks/orange_block.png";
 
 export default {
   name: "CardItem",
@@ -26,6 +24,8 @@ export default {
     count: Number,
     cost: Number,
     map: Array,
+    block:String,
+    sp_block:String,
   },
   data() {
     return {
@@ -47,10 +47,10 @@ export default {
               image.src = src_frame;
               break;
             case 1:
-              image.src = src_yellow_block;
+              image.src = this.block;
               break;
             case 2:
-              image.src = src_orange_block;
+              image.src = this.sp_block;
               break;
             default:
               break;

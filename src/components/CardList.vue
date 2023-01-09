@@ -2,15 +2,17 @@
   <div class="CardList">
     <div class="container">
       <div v-for="(value, key, index) in cardList" v-bind:key="index">
-        <CardItem :name="value.name" :count="value.count" :cost="value.cost" :map="value.map"/>
+        <CardItem :name="value.name" :count="value.count" :cost="value.cost" :map="value.map"
+        :block="value.block" :sp_block="value.sp_block"/>
       </div>
-      <!--<CardItem :name="hoge" :count="10" :cost="3" :map="[0,0,0,1,1,1,0,0,0,0]"/>-->
     </div>
   </div>
 </template>
 
 <script>
 import CardItem from "@/components/CardItem.vue";
+import src_yellow_block from "../assets/blocks/yellow_block.png";
+import src_orange_block from "../assets/blocks/orange_block.png";
 
 export default {
   name: "CardListView",
@@ -40,6 +42,8 @@ export default {
             count: json[i].count,
             cost: json[i].cost,
             map: JSON.parse("[" + json[i].map + "]"),
+            block: src_yellow_block,
+            sp_block: src_orange_block,
           });
         }
       });
@@ -50,13 +54,16 @@ export default {
 <style scoped>
 .container {
   background-color: #008b8b;
-  width: 480px;
+  width: 460px;
   height: 600px;
   border: solid 5px #006400;
   display: flex;
   flex-wrap: wrap;
   overflow-y: scroll;
   padding: 0px 0px;
+}
+.container::-webkit-scrollbar{
+  display: none;
 }
 .card-item {
   background-color: #808080;
