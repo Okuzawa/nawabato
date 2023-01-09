@@ -15,8 +15,6 @@
 </template>
 
 <script>
-import src_frame from "../assets/blocks/frame.png";
-
 export default {
   name: "CardItem",
   props: {
@@ -44,7 +42,7 @@ export default {
           let image = new Image();
           switch (map[index]) {
             case 0:
-              image.src = src_frame;
+              image.src = this.$store.state.blocks[0];
               break;
             case 1:
               image.src = this.block;

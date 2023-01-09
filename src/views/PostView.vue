@@ -1,7 +1,7 @@
 <template>
   <div class="post">
     <HelloWorld msg="ぽすと"/>
-    <div class="wrap"><card-list/></div>
+    <div class="wrap"><CardList/></div>
   </div>
 </template>
 

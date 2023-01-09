@@ -1,5 +1,4 @@
 <template>
-  <card-list />
   <div class="about">
     <div id="app">
       <label>名前</label>

@@ -5,8 +5,30 @@
     <router-link to="/about">About</router-link>
     <router-link to="/post">Post</router-link>
   </nav>
-  <router-view/>
+  <router-view />
 </template>
+
+<script>
+import src_frame from "./assets/blocks/frame.png";
+import src_yellow_block from "./assets/blocks/yellow_block.png";
+import src_orange_block from "./assets/blocks/orange_block.png";
+
+export default {
+  data() {
+    return {
+      cardList:[],
+    };
+  },
+  created: function () {
+    this.$store.commit("addBlockSrc", { src: src_frame });
+    this.$store.commit("addBlockSrc", { src: src_yellow_block });
+    this.$store.commit("addBlockSrc", { src: src_orange_block });
+
+    this.$store.dispatch("addCardListAsync");
+  },
+};
+</script>
+
 
 <style lang="scss">
 #app {

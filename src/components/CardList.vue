@@ -1,9 +1,9 @@
 <template>
   <div class="CardList">
     <div class="container">
-      <div v-for="(value, key, index) in cardList" v-bind:key="index">
+      <div v-for="(value, key, index) in this.$store.state.cardList" v-bind:key="index">
         <CardItem :name="value.name" :count="value.count" :cost="value.cost" :map="value.map"
-        :block="value.block" :sp_block="value.sp_block"/>
+        :block="this.$store.state.blocks[1]" :sp_block="this.$store.state.blocks[2]"/>
       </div>
     </div>
   </div>
@@ -11,8 +11,6 @@
 
 <script>
 import CardItem from "@/components/CardItem.vue";
-import src_yellow_block from "../assets/blocks/yellow_block.png";
-import src_orange_block from "../assets/blocks/orange_block.png";
 
 export default {
   name: "CardListView",
@@ -21,32 +19,10 @@ export default {
   },
   data() {
     return {
-      cardList: []
     };
   },
   created: function () {
-    var api_url =
-      "https://script.google.com/macros/s/AKfycbx1KFHoEykkjIe3Rn3LVo6_kLglJmK_KZE8uNbwfkgv3lrCQ6p3-JhFI2uADL8GcHdQ/exec";
-
-    let cardList = this.cardList;
-
-    fetch(api_url)
-      .then(function (fetch_data) {
-        return fetch_data.json();
-      })
-      .then(function (json) {
-        for (var i in json) {
-          //console.log(json[i].map);
-          cardList.push({
-            name: json[i].name,
-            count: json[i].count,
-            cost: json[i].cost,
-            map: JSON.parse("[" + json[i].map + "]"),
-            block: src_yellow_block,
-            sp_block: src_orange_block,
-          });
-        }
-      });
+    
   },
 };
 </script>
