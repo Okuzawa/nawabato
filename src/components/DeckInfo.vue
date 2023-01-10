@@ -1,9 +1,6 @@
 <template>
   <div class="container">
-    <div
-      v-for="(value, key, index) in this.$store.state.cardList"
-      v-bind:key="index"
-    >
+    <div v-for="(value, key, index) in cardList" v-bind:key="index">
       <CardItem
         :name="value.name"
         :count="value.count"
@@ -24,25 +21,36 @@ export default {
   components: {
     CardItem,
   },
-  data() {
-    return {};
+  props: {
+    deck: Array,
   },
-  created: function () {},
+  data() {
+    return {
+      cardList: [],
+    };
+  },
+  mounted() {
+    this.loadDeck(this.deck);
+  },
+  methods: {
+    loadDeck: function (deck) {
+      this.cardList = deck;
+    },
+  },
 };
 </script>
 
 <style scoped>
 .container {
-  background-color: #008b8b;
+  background-color: #87f6f6;
   width: 550px;
-  height: 500px;
+  height: 182px;
   border: solid 5px #260064;
+  padding: 0px;
   display: flex;
-  flex-wrap: wrap;
-  overflow-y: scroll;
-  padding: 0px 0px;
+  overflow-x: scroll;
 }
-.container::-webkit-scrollbar {
-  display: none;
+.CardItem {
+  width: 20%;
 }
 </style>

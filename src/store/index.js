@@ -12,7 +12,7 @@ export default createStore({
       state.blocks.push(src);
     },
     addCardList(state, { data }) {
-      state.cardList.push({ name: data.name, count: data.count, cost: data.cost, map: JSON.parse("[" + data.map + "]") });
+      state.cardList.push({ id:data.id, name: data.name, count: data.count, cost: data.cost, map: JSON.parse("[" + data.map + "]") });
     },
   },
   actions: {
