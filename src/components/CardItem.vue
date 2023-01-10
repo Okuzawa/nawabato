@@ -54,7 +54,7 @@ export default {
               break;
           }
           image.onload = () => {
-            this.ctx.drawImage(image, x * 38, y * 19, 38, 19);
+            this.ctx.drawImage(image, x * 36+6, y * 18+3, 36, 18);
           };
           index++;
         }
@@ -66,30 +66,33 @@ export default {
 
 <style scoped>
 .card-item {
-  width: 150px;
-  height: 250px;
+  width: 90px;
+  height: 150px;
 }
 .card-item canvas {
   background-color: #a7a6a6;
-  width: 130px;
-  height: 130px;
+  width: 80px;
+  height: 80px;
   margin: 0px -10px;
 }
 .card-item .name {
-  font-size: auto;
+  font-size: 0.5em;
   line-height: 1;
 }
 .card-item .count {
-  font-size: 300%;
+  margin: 1px;
+  font-size: 1.5em;
 }
 .card-item .sp {
-  font-size: 100%;
+  font-size: 0.3em;
 }
 .card-item .cost {
-  font-size: 150%;
+  font-size: 1em;
 }
 .card-item div {
   display: inline-block;
-  line-height: 0.6;
+  vertical-align: top;
+  line-height: 0.1;
+  margin: -10px 0px;
 }
 </style>

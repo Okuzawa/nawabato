@@ -1,7 +1,7 @@
 <template>
   <div class="post">
     <HelloWorld msg="ぽすと"/>
-    <div class="wrap"><CardList/></div>
+    <div class="item"><CardList/></div>
   </div>
 </template>
 
@@ -18,9 +18,4 @@ export default {
 </script>
 
 <style>
-.wrap {
-  margin-top: -150px;
-  margin-left: 100px;
-  transform: scale(0.5, 0.5);
-}
 </style>

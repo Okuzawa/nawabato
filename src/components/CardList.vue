@@ -30,9 +30,9 @@ export default {
 <style scoped>
 .container {
   background-color: #008b8b;
-  width: 460px;
-  height: 600px;
-  border: solid 5px #006400;
+  width: 550px;
+  height: 500px;
+  border: solid 5px #260064;
   display: flex;
   flex-wrap: wrap;
   overflow-y: scroll;
@@ -40,26 +40,5 @@ export default {
 }
 .container::-webkit-scrollbar{
   display: none;
-}
-.card-item {
-  background-color: #808080;
-  width: 150px;
-  height: 250px;
-  border: solid 3px #b0c4de;
-}
-.card-item canvas {
-  background-color: #696969;
-  width: 130px;
-  height: 130px;
-}
-.card-item .ttl {
-  font-size: 25px;
-  line-height: 1;
-}
-.card-item p {
-  line-height: 0.5;
-}
-.card-item div {
-  display: inline-block;
 }
 </style>
