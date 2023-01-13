@@ -28,13 +28,8 @@ export default {
   },
   methods: {
     loadDeck: function () {
-      var cardList = [3,9,12,15,18,21,24,27,30,22,33,11,44,1,5]
-      for (let index = 0; index < cardList.length; index++) {
-        this.myDeck.push(this.$store.state.cardList[cardList[index]]);
-      }
-      /*cardList.forEach(function(id){
-        this.myDeck.push(this.$store.state.cardList[id]);
-      });*/
+      let cardList = [3,9,12,15,18,21,24,27,30,22,33,11,44,1,5];
+      cardList.forEach(id=>this.myDeck.push(this.$store.state.cardList[id]));
     },
   },
 };

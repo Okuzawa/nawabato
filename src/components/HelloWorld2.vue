@@ -1,16 +1,14 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
+  <div class="hello2">
+    <h1>{{ props.msg }}</h1>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
+<script setup>
+import {defineProps} from 'vue';
+const props = defineProps({
+    msg:String
+});
 </script>
 
 <style scoped lang="scss">
