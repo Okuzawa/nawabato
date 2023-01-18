@@ -1,6 +1,6 @@
 <template>
   <div class="hello2">
-    <h1>{{ props.msg }}</h1>
+    <h3>{{ props.msg }}</h3>
   </div>
 </template>
 
@@ -12,8 +12,9 @@ const props = defineProps({
 </script>
 
 <style scoped lang="scss">
-h1 {
+h3 {
   margin: 0;
+  color: #6c42b9;
 }
 ul {
   list-style-type: none;
@@ -22,8 +23,5 @@ ul {
 li {
   display: inline-block;
   margin: 0;
-}
-h1 {
-  color: #6c42b9;
 }
 </style>
