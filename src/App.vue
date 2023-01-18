@@ -1,10 +1,11 @@
 <template>
   <h1>ナワバトラー</h1>
   <nav>
-    <router-link to="/">Title</router-link> |
-    <router-link to="/home">Home</router-link> |
+    <router-link to="/">Home</router-link> |
+    <router-link to="/Lobby">ロビー</router-link> |
     <router-link to="/about">about</router-link> |
-    <router-link to="/deck-list">デッキ一覧</router-link>
+    <router-link to="/deck-list">デッキ一覧</router-link> |
+    <router-link to="/deck-edit">デッキ編集</router-link>
   </nav>
   <router-view />
 </template>
