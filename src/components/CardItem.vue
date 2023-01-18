@@ -1,6 +1,6 @@
 <template>
   <div class="CardItem">
-    <button class="card-item btn btn-outline-secondary" @click="select">
+    <button class="card-item btn btn-secondary">
       <canvas ref="cardCanvas"></canvas>
       <p class="name">{{ name }}</p>
       <div class="count">
@@ -18,7 +18,6 @@
 export default {
   name: "CardItem",
   props: {
-    id:Number,
     name: String,
     count: Number,
     cost: Number,
@@ -28,7 +27,7 @@ export default {
   },
   data() {
     return {
-      isSelect:false,
+      ctx:null,
     };
   },
   mounted() {
@@ -61,14 +60,11 @@ export default {
         }
       }
     },
-    select:function () {
-      console.log(this.id,this.name);
-    }
   },
 };
 </script>
 
-<style>
+<style scoped>
 .card-item {
   width: 90px;
   height: 150px;

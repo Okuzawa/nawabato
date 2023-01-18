@@ -5,7 +5,6 @@
       v-bind:key="index"
     >
       <CardItem
-        :id="value.id"
         :name="value.name"
         :count="value.count"
         :cost="value.cost"
@@ -18,7 +17,7 @@
 </template>
 
 <script>
-import CardItem from "@/components/parts/CardItem.vue";
+import CardItem from "@/components/CardItem.vue";
 
 export default {
   name: "CardListView",
@@ -26,17 +25,15 @@ export default {
     CardItem,
   },
   data() {
-    return {
-    };
+    return {};
   },
-  methods: {
-  },
+  created: function () {},
 };
 </script>
 
 <style scoped>
 .container {
-  background-color: #eeffeb;
+  background-color: #008b8b;
   width: 550px;
   height: 500px;
   border: solid 5px #260064;

@@ -1,26 +1,12 @@
 <template>
   <div class="home">
-    <HelloWorld2 msg="ホーム画面" />
-    <label>ユーザー名</label>
-    <input type="text" placeholder="名前を入力" />
-    <div>
-      <button class="btn btn-outline-secondary">
-        <p>バトル</p>
-      </button>
-      <button class="btn btn-outline-secondary">
-        <p>デッキリスト</p>
-      </button>
-    </div>
+    <img alt="Vue logo" src="../assets/logo.png">
+    <HelloWorld2 msg="てすてす"/>
   </div>
 </template>
 
 <script setup>
-import HelloWorld2 from "@/components/parts/HelloWorld2.vue";
+// @ is an alias to /src
+import HelloWorld2 from '@/components/HelloWorld2.vue'
+
 </script>
-<style>
-.home button {
-  background-color: #b1e9ee;
-  width: 150px;
-  height: 30px;
-}
-</style>

@@ -1,35 +1,36 @@
 <template>
   <h1>ナワバトラー</h1>
   <nav>
-    <router-link to="/">Title</router-link> |
-    <router-link to="/home">Home</router-link> |
-    <router-link to="/about">about</router-link> |
-    <router-link to="/deck-list">デッキ一覧</router-link>
+    <router-link to="/">Home</router-link> |
+    <router-link to="/about">About</router-link>
+    <router-link to="/deck-info">デッキ詳細</router-link>
   </nav>
   <router-view />
 </template>
 
 <script>
-import src_frame from "./assets/image/blocks/frame.png";
-import src_yellow_block from "./assets/image/blocks/yellow_block.png";
-import src_orange_block from "./assets/image/blocks/orange_block.png";
+import src_frame from "./assets/blocks/frame.png";
+import src_yellow_block from "./assets/blocks/yellow_block.png";
+import src_orange_block from "./assets/blocks/orange_block.png";
 
 export default {
+  data() {
+    return {
+      cardList:[],
+    };
+  },
   created: function () {
     this.$store.commit("addBlockSrc", { src: src_frame });
     this.$store.commit("addBlockSrc", { src: src_yellow_block });
     this.$store.commit("addBlockSrc", { src: src_orange_block });
 
     this.$store.dispatch("addCardListAsync");
-
-    console.log(this.$store.state.db);
-    if(this.$store.state.db == null) this.$store.dispatch("createUserData");
-    console.log(this.$store.state.db);
   },
 };
 </script>
 
-<style lang="scss" >
+
+<style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

@@ -1,18 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-//import HomeView from '../views/HomeView.vue'
+import HomeView from '../views/HomeView.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'title',
-    //component: HomeView
-    component: () => import(/* webpackChunkName: "title" */ '../views/TitleView.vue')
-  },
-  {
-    path: '/home',
     name: 'home',
-    //component: HomeView
-    component: () => import(/* webpackChunkName: "home" */ '../views/HomeView.vue')
+    component: HomeView
   },
   {
     path: '/about',
@@ -23,15 +16,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   },
   {
-    path: '/deck-list',
-    name: 'deck-list',
-    component: () => import(/* webpackChunkName: "deck-list" */ '../views/DeckListView.vue')
-  },
-  {
-    path: '/deck-edit',
-    name: 'deck-edit',
-    component: () => import(/* webpackChunkName: "deck-edit" */ '../views/DeckEditView.vue'),
-    props: route => ({id: route.params.deckID}),
+    path: '/deck-info',
+    name: 'deck-info',
+    component: () => import(/* webpackChunkName: "about" */ '../views/DeckInfoView.vue')
   }
 ]
 

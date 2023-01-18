@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import CardItem from "@/components/parts/CardItem.vue";
+import CardItem from "@/components/CardItem.vue";
 
 export default {
   name: "CardListView",
@@ -42,7 +42,7 @@ export default {
 
 <style scoped>
 .container {
-  background-color: #eeffeb;
+  background-color: #87f6f6;
   width: 550px;
   height: 182px;
   border: solid 5px #260064;
