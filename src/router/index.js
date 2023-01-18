@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
-    path: '/nawabato',
+    path: '/',
     name: 'title',
     //component: HomeView
     component: () => import(/* webpackChunkName: "title" */ '../views/TitleView.vue')
