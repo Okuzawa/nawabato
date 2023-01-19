@@ -36,7 +36,7 @@ export default createStore({
   },
   actions: {
     addCardListAsync: function (context) {
-      const api_url =
+      var api_url =
         "https://script.google.com/macros/s/AKfycbx1KFHoEykkjIe3Rn3LVo6_kLglJmK_KZE8uNbwfkgv3lrCQ6p3-JhFI2uADL8GcHdQ/exec";
 
       fetch(api_url)
@@ -44,8 +44,13 @@ export default createStore({
           return fetch_data.json();
         })
         .then(function (json) {
+<<<<<<< HEAD
           for (let i in json) {
             context.commit("addCardList", { data: json[i] })
+=======
+          for (var i in json) {
+            context.commit("addCardList",{data: json[i]})
+>>>>>>> parent of 2f007c3 (vue3要素を追加)
           }
         });
     },

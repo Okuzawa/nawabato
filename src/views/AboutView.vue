@@ -34,7 +34,7 @@ export default {
   },
   created: function () {
     // Your web app's Firebase configuration
-    const firebaseConfig = {
+    var firebaseConfig = {
       apiKey: "AIzaSyArEFrBMUMDHAYTjFJ2HhsHb__zIPYMfLc",
       authDomain: "turf-war-ebf17.firebaseapp.com",
       projectId: "turf-war-ebf17",
