@@ -45,9 +45,12 @@ export default createStore({
         })
         .then(function (json) {
 <<<<<<< HEAD
+<<<<<<< HEAD
           for (let i in json) {
             context.commit("addCardList", { data: json[i] })
 =======
+=======
+>>>>>>> parent of 2f007c3 (vue3要素を追加)
           for (var i in json) {
             context.commit("addCardList",{data: json[i]})
 >>>>>>> parent of 2f007c3 (vue3要素を追加)

@@ -1,6 +1,7 @@
 <template>
   <div class="home">
 <<<<<<< HEAD
+<<<<<<< HEAD
     <HelloWorld2 msg="ログイン画面" />
     <label>ユーザー名</label>
     <input type="text" placeholder="名前を入力" />
@@ -39,12 +40,26 @@ const joinType = ref(1);
 // @ is an alias to /src
 import HelloWorld from '@/components/HelloWorld.vue'
 
+=======
+    <img alt="Vue logo" src="../assets/logo.png">
+    <HelloWorld msg="てすとだよ"/>
+  </div>
+</template>
+
+<script>
+// @ is an alias to /src
+import HelloWorld from '@/components/HelloWorld.vue'
+
+>>>>>>> parent of 2f007c3 (vue3要素を追加)
 export default {
   name: 'HomeView',
   components: {
     HelloWorld
   }
 }
+<<<<<<< HEAD
+>>>>>>> parent of 2f007c3 (vue3要素を追加)
+=======
 >>>>>>> parent of 2f007c3 (vue3要素を追加)
 </script>
 <style>
