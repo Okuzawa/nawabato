@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import CardItem from "@/components/CardItem.vue";
+import CardItem from "@/components/parts/CardItem.vue";
 
 export default {
   name: "CardListView",

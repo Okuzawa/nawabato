@@ -16,8 +16,8 @@
 <script>
 import CardList from "@/components/CardList.vue";
 import DeckInfo from "@/components/DeckInfo.vue";
-import HelloWorld from "@/components/HelloWorld.vue";
-import Button from "@/components/Button.vue";
+import HelloWorld from "@/components/parts/HelloWorld.vue";
+import Button from "@/components/parts/Button.vue";
 
 export default {
   components: {

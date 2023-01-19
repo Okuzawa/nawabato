@@ -12,7 +12,7 @@
 
 <script>
 // @ is an alias to /src
-import HelloWorld2 from '@/components/HelloWorld2.vue'
+import HelloWorld2 from '@/components/parts/HelloWorld2.vue'
 
 export default {
   name: "CardListView",

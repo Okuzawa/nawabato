@@ -27,7 +27,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import HelloWorld2 from "@/components/HelloWorld2.vue";
+import HelloWorld2 from "@/components/parts/HelloWorld2.vue";
 
 const joinType = ref(1);
 =======
