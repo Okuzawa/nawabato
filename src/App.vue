@@ -7,15 +7,13 @@
     <router-link to="/deck-list">デッキ一覧</router-link> |
     <router-link to="/deck-edit">デッキ編集</router-link>
   </nav>
-  <a href="/Lobby"><p>ここはリンクになっています。</p></a>
-  <button onclick="location.href='/Lobby'">test</button>
   <router-view />
 </template>
 
 <script>
-import src_frame from "./assets/image/blocks/frame.png";
-import src_yellow_block from "./assets/image/blocks/yellow_block.png";
-import src_orange_block from "./assets/image/blocks/orange_block.png";
+import src_frame from "./assets/blocks/frame.png";
+import src_yellow_block from "./assets/blocks/yellow_block.png";
+import src_orange_block from "./assets/blocks/orange_block.png";
 
 export default {
   created: function () {
