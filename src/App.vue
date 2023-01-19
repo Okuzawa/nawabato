@@ -7,6 +7,8 @@
     <router-link to="/deck-list">デッキ一覧</router-link> |
     <router-link to="/deck-edit">デッキ編集</router-link>
   </nav>
+  <a href="/Lobby"><p>ここはリンクになっています。</p></a>
+  <button onclick="location.href='/Lobby'">test</button>
   <router-view />
 </template>
 
