@@ -4948,4 +4948,4 @@ function hk(e,t){if(void 0===t)return{merge:!1};if(void 0!==t.mergeFields&&void 
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */function Uk(e){Vk(e,((e,t)=>new vk(e,t,new yk))),e.registerVersion(uk,lk)}let qk;Uk(dn);var Bk={name:"app",data(){return{messageList:[],userName:"ユーザーA",message:"テストメッセージです"}},created:function(){var e={apiKey:"AIzaSyArEFrBMUMDHAYTjFJ2HhsHb__zIPYMfLc",authDomain:"turf-war-ebf17.firebaseapp.com",projectId:"turf-war-ebf17",storageBucket:"turf-war-ebf17.appspot.com",messagingSenderId:"1096461103992",appId:"1:1096461103992:web:57b6f83644c9882d8d8e8d"};dn.initializeApp(e);const t=dn.firestore();qk=t.collection("chat_messages");let n=this.messageList;qk.orderBy("created","desc").onSnapshot((function(e){n.length=0,e.forEach((e=>{n.push(e.data())}))}))},methods:{sendMessage:function(){qk.add({user_name:this.userName,message:this.message,created:(new Date).getTime()})}}},jk=n(3744);const Gk=(0,jk.Z)(Bk,[["render",f],["__scopeId","data-v-01cc2540"]]);var Kk=Gk}}]);
-//# sourceMappingURL=about.6ee821e8.js.map
+//# sourceMappingURL=about.7d9ee51d.js.map
