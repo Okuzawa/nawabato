@@ -1,32 +1,25 @@
 <template>
   <div class="post">
-    <Button @clickEvent="hoge" />
     <div>
       <label>デッキ名</label>
       <input type="text" />
-      <button>保存</button>
     </div>
-    <DeckInfo :deck="loadDeck" />
-    <HelloWorld msg="カード一覧" />
-    <CardList/>
+    <DeckInfo :deck="loadDeck" class="deck-list" />
+    <h4>カード一覧</h4>
+    <CardList class="card-list" />
   </div>
 </template>
 
 <script>
 import CardList from "@/components/CardList.vue";
 import DeckInfo from "@/components/DeckInfo.vue";
-import HelloWorld from "@/components/parts/HelloWorld.vue";
-import Button from "@/components/parts/Button.vue";
 
 export default {
   components: {
-    HelloWorld,
     CardList,
     DeckInfo,
-    Button,
   },
-  props: {
-  },
+  props: {},
   data() {
     return {
       myDeck: [],
@@ -48,9 +41,22 @@ export default {
         this.myDeck.push(this.$store.state.cardList[id]);
       },
     },
-  }
+  },
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.post {
+  h4 {
+    margin-top: -20px;
+  }
+  .deck-list {
+    transform: scale(0.7);
+    margin-top: -20px;
+  }
+  .card-list {
+    transform: scale(0.7);
+    margin-top: -80px;
+  }
+}
 </style>

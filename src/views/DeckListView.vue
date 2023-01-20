@@ -64,14 +64,14 @@ export default {
     }
   }
   ul {
-    background-color: #00eeff;
+    background-color: #effeff;
     width: 85px;
     height: 30px;
     margin: 0px 0px;
     padding: 0px 0px;
     p{
       white-space: nowrap;
-      font-size: 0.1%;
+      font-size: 50%;
       color:black;
       margin: 5px 0px;
     }

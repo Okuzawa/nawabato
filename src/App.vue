@@ -19,7 +19,7 @@
         <div v-if="store.state.isLoading">
           <p>読み込み中</p>
         </div>
-        <div v-else>
+        <div v-else id="top-list">
           <DeckListView v-if="joinType == 1"/>
           <DeckEditView v-if="joinType == 2" />
         </div>
@@ -120,5 +120,8 @@ nav {
   width: 100%;
   padding: 1em;
   background: #fff;
+}
+#top-list {
+  margin: 0px -100px;
 }
 </style>
