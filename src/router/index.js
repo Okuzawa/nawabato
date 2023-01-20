@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue'
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'home',
     component: HomeView
   },
@@ -30,7 +30,6 @@ const routes = [
     path: '/deck-edit',
     name: 'deck-edit',
     component: () => import(/* webpackChunkName: "deck-edit" */ '../views/DeckEditView.vue'),
-    props: route => ({id: route.params.deckID}),
   }
 ]
 

@@ -3,18 +3,18 @@ import Dexie from 'dexie';
 
 export default createStore({
   state: {
+    isLoading : true,
+    currentDeck: 1,
     db: null,
     blocks: [],
     cardList: [],
     deckList: [
-      { name: "スターターデッキ", deck: [1, 2, 3, 4, 5, 6, 7] },
-      { name: "temp", deck: [] },
-      { name: "temp", deck: [] },
-      { name: "temp", deck: [] },
-      { name: "temp", deck: [] },
-      { name: "temp", deck: [] },
-      { name: "temp", deck: [] },
-      { name: "temp", deck: [] },
+      { name: "スターターデッキ", deck: [1,2,3,4,5,6,7] },
+      { name: "temp", deck: [0,0,0,0,0,0,0] },
+      { name: "temp", deck: [0,0,0,0,0,0,0] },
+      { name: "temp", deck: [0,0,0,0,0,0,0] },
+      { name: "temp", deck: [0,0,0,0,0,0,0] },
+      { name: "temp", deck: [0,0,0,0,0,0,0] },
     ],
   },
   getters: {
@@ -47,6 +47,10 @@ export default createStore({
           for (let i in json) {
             context.commit("addCardList", { data: json[i] })
           }
+        })
+        .then(function(){
+          context.state.isLoading = false;
+          console.log("done")
         });
     },
     createUserData: function (context) {

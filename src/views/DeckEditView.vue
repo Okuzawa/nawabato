@@ -1,6 +1,5 @@
 <template>
   <div class="post">
-    <h1>{{ deckID }}</h1>
     <Button @clickEvent="hoge" />
     <div>
       <label>デッキ名</label>
@@ -9,7 +8,7 @@
     </div>
     <DeckInfo :deck="loadDeck" />
     <HelloWorld msg="カード一覧" />
-    <CardList @clickEvent="hoge"/>
+    <CardList/>
   </div>
 </template>
 

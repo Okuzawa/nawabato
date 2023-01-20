@@ -1,20 +1,41 @@
 <template>
   <h1>ナワバトラー</h1>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/Lobby">ロビー</router-link> |
-    <router-link to="/about">about</router-link> |
-    <router-link to="/deck-list">デッキ一覧</router-link> |
-    <router-link to="/deck-edit">デッキ編集</router-link>
-  </nav>
-  <router-view />
 
-  <button v-on:click="openModal">Click</button>
+  <label>選択中のデッキ ： {{ this.$store.state.deckList[this.$store.state.currentDeck].name }}</label>
+  <button v-on:click="openModal">デッキ変更</button>
 
   <div id="overlay" v-show="showContent">
     <div id="content">
-      <DeckInfo/>
-      <p><button v-on:click="closeModal">close</button></p>
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button
+          type="button"
+          class="btn-close"
+          v-on:click="closeModal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+        <div v-if="this.$store.state.isLoading">
+          <p>読み込み中</p>
+        </div>
+        <div v-else>
+          <DeckListView v-if="joinType == 1"/>
+          <DeckEditView v-if="joinType == 2" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          v-on:click="joinType = 1"
+        >
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" v-on:click="joinType = 2">
+          Save changes
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -27,7 +48,8 @@ import src_frame from "./assets/image/blocks/frame.png";
 import src_yellow_block from "./assets/image/blocks/yellow_block.png";
 import src_orange_block from "./assets/image/blocks/orange_block.png";
 
-import DeckInfo from "./views/DeckListView.vue";
+import DeckListView from "./views/DeckListView.vue";
+import DeckEditView from "./views/DeckEditView.vue";
 
 function init() {
   store.commit("addBlockSrc", { src: src_frame });
@@ -36,15 +58,15 @@ function init() {
 
   store.dispatch("addCardListAsync");
 
-  console.log(store.state.db);
   if (store.state.db == null) store.dispatch("createUserData");
-  console.log(store.state.db);
 }
 init();
 
+const joinType = ref(1);
+
 const showContent = ref(false);
 const openModal = () => {
-  console.log("open");
+  console.log(store.state.currentDeck);
   showContent.value = true;
 };
 
