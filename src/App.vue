@@ -1,7 +1,7 @@
 <template>
   <h1>ナワバトラー</h1>
 
-  <label>選択中のデッキ ： {{ store.state.deckList[store.state.currentDeck].name }}</label>
+  <label>選択中のデッキ ： {{ store.state.db_deck_list[store.state.currentDeck].name }}</label>
   <button v-on:click="openModal">デッキ変更</button>
 
   <div id="overlay" v-show="showContent">
@@ -58,10 +58,11 @@ function init() {
 
   store.dispatch("addCardListAsync");
 
-  if (store.state.db == null) store.dispatch("createUserData");
+  store.commit("createUserData");
 }
 init();
 
+console.log( "db:",store.state.db_deck_list );
 const joinType = ref(1);
 
 const showContent = ref(false);

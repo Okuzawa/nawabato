@@ -35,6 +35,11 @@ export default {
     this.ctx = this.$refs.cardCanvas.getContext("2d");
     this.imageDraw(this.map);
   },
+  watch: {
+    map: function(){
+      this.imageDraw(this.map);
+    }
+  },
   methods: {
     imageDraw: function (map) {
       let index = 0;

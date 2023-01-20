@@ -4,7 +4,7 @@
       <div>
         <div
           class="name"
-          v-for="(value, key, index) in this.$store.state.deckList"
+          v-for="(value, key, index) in this.$store.state.db_deck_list"
           :key="index"
         >
           <ul
@@ -38,7 +38,7 @@ export default {
   methods: {
     loadDeck: function () {
       this.myDeck.splice(0);
-      let cardList = this.$store.state.deckList[this.$store.state.currentDeck].deck;
+      let cardList = this.$store.state.db_deck_list[this.$store.state.currentDeck].deck;
       cardList.forEach((id) =>
         this.myDeck.push(this.$store.getters.getCardList(id)));
       console.log(this.myDeck);
@@ -65,10 +65,16 @@ export default {
   }
   ul {
     background-color: #00eeff;
-    width: 150px;
-    height: 50px;
+    width: 85px;
+    height: 30px;
     margin: 0px 0px;
     padding: 0px 0px;
+    p{
+      white-space: nowrap;
+      font-size: 0.1%;
+      color:black;
+      margin: 5px 0px;
+    }
   }
   .container {
     margin: 0px 0px;

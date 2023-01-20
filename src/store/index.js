@@ -1,21 +1,12 @@
 import { createStore } from 'vuex'
-import Dexie from 'dexie';
 
 export default createStore({
   state: {
-    isLoading : true,
-    currentDeck: 1,
-    db: null,
+    isLoading: true,
+    currentDeck: 0,
+    db_deck_list: [],
     blocks: [],
-    cardList: [],
-    deckList: [
-      { name: "スターターデッキ", deck: [1,2,3,4,5,6,7] },
-      { name: "temp", deck: [0,0,0,0,0,0,0] },
-      { name: "temp", deck: [0,0,0,0,0,0,0] },
-      { name: "temp", deck: [0,0,0,0,0,0,0] },
-      { name: "temp", deck: [0,0,0,0,0,0,0] },
-      { name: "temp", deck: [0,0,0,0,0,0,0] },
-    ],
+    cardList: []
   },
   getters: {
     getBlockSrc: (state) => (index) => {
@@ -32,7 +23,29 @@ export default createStore({
     addCardList(state, { data }) {
       state.cardList.push({ id: data.id, name: data.name, count: data.count, cost: data.cost, map: JSON.parse("[" + data.map + "]") });
     },
-    DB_CONNECTION: (state, payload) => (state.db = payload),
+    createUserData: function (state) {
+      if (localStorage.getItem("userData") == null) {
+        console.log("新規作成")
+        localStorage.setItem("userData", "true")
+        
+        let deckList = [];
+        deckList.push({name: "スターターデッキ", deck: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]});
+        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        let json = JSON.stringify(deckList);
+        localStorage.setItem('tb_deck', json);
+        state.db_deck_list = JSON.parse(json);
+      }
+      else {
+        console.log("データ取得")
+
+        let json = localStorage.getItem('tb_deck');
+        state.db_deck_list = JSON.parse(json);
+      }
+    }
   },
   actions: {
     addCardListAsync: function (context) {
@@ -48,19 +61,10 @@ export default createStore({
             context.commit("addCardList", { data: json[i] })
           }
         })
-        .then(function(){
+        .then(function () {
           context.state.isLoading = false;
           console.log("done")
         });
-    },
-    createUserData: function (context) {
-      const db = new Dexie('user_db');
-      db.version(1).stores({
-        // ストア名: "キーをカンマ区切りで記入"
-        user: "++user_id, name",
-        deck: "++deck_id, name, deck_list",
-      });
-      context.commit("DB_CONNECTION", { payload: db })
-    },
+    }
   }
 })
