@@ -1,7 +1,7 @@
 <template>
   <h1>ナワバトラー</h1>
 
-  <label>選択中のデッキ ： {{ this.$store.state.deckList[this.$store.state.currentDeck].name }}</label>
+  <label>選択中のデッキ ： {{ store.state.deckList[store.state.currentDeck].name }}</label>
   <button v-on:click="openModal">デッキ変更</button>
 
   <div id="overlay" v-show="showContent">
@@ -16,7 +16,7 @@
       </div>
       <div class="modal-body">
         <p>Modal body text goes here.</p>
-        <div v-if="this.$store.state.isLoading">
+        <div v-if="store.state.isLoading">
           <p>読み込み中</p>
         </div>
         <div v-else>
