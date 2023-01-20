@@ -10,8 +10,8 @@
         :count="value.count"
         :cost="value.cost"
         :map="value.map"
-        :block="this.$store.state.blocks[1]"
-        :sp_block="this.$store.state.blocks[2]"
+        :block="store.state.blocks[1]"
+        :sp_block="store.state.blocks[2]"
       />
     </div>
   </div>
@@ -19,6 +19,7 @@
 
 <script setup>
 import {defineProps} from 'vue';
+import store from "@/store";
 import CardItem from "@/components/parts/CardItem.vue";
 
 const props = defineProps({
