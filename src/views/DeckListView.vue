@@ -1,5 +1,9 @@
 <template>
   <div class="deckList">
+    <h4>
+      {{this.$store.state.db_deck_list[this.$store.state.currentDeck].name}}
+      マス合計：{{ totalCount }}
+    </h4>
     <div class="list">
       <div>
         <div
@@ -7,10 +11,7 @@
           v-for="(value, key, index) in this.$store.state.db_deck_list"
           :key="index"
         >
-          <ul
-            class="btn btn-outline-secondary"
-            @click="selectDeck(key)"
-          >
+          <ul class="btn btn-outline-secondary" @click="selectDeck(key)">
             <p>{{ value.name }}</p>
           </ul>
         </div>
@@ -28,10 +29,10 @@ export default {
   components: {
     Deck,
   },
-  props: {
-  },
+  props: {},
   data() {
     return {
+      totalCount: 0,
       myDeck: [],
     };
   },
@@ -40,17 +41,25 @@ export default {
       this.myDeck.splice(0);
       let cardList = this.$store.state.db_deck_list[this.$store.state.currentDeck].deck;
       cardList.forEach((id) =>
-        this.myDeck.push(this.$store.getters.getCardList(id)));
-      console.log(this.myDeck);
+        this.myDeck.push(this.$store.getters.getCardList(id))
+      );
+      this.totalCount = this.getTotalCount(this.myDeck)
     },
-    selectDeck: function(index){
+    selectDeck: function (index) {
       this.$store.state.currentDeck = index;
       this.loadDeck();
-    }
+    },
+    getTotalCount: function (deck) {
+      let totalCount = 0;
+      deck.forEach((item) => {
+        totalCount += item.count;
+      });
+      return totalCount;
+    },
   },
-  created(){
+  created() {
     this.loadDeck();
-  }
+  },
 };
 </script>
 
@@ -69,10 +78,10 @@ export default {
     height: 30px;
     margin: 0px 0px;
     padding: 0px 0px;
-    p{
+    p {
       white-space: nowrap;
       font-size: 50%;
-      color:black;
+      color: black;
       margin: 5px 0px;
     }
   }

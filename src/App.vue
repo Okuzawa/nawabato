@@ -7,33 +7,25 @@
   <div id="overlay" v-show="showContent">
     <div id="content">
       <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
-        <button
-          type="button"
-          class="btn-close"
-          v-on:click="closeModal"
-        ></button>
+        <h5 class="modal-title" v-if="joinType == 1">デッキ一覧</h5>
+        <h5 class="modal-title" v-if="joinType == 2">デッキ編集</h5>
+        <button type="button" class="btn-close" v-on:click="closeModal"></button>
       </div>
       <div class="modal-body">
-        <p>Modal body text goes here.</p>
         <div v-if="store.state.isLoading">
-          <p>読み込み中</p>
+          <p >読み込み中</p>
         </div>
         <div v-else id="top-list">
           <DeckListView v-if="joinType == 1"/>
-          <DeckEditView v-if="joinType == 2" />
+          <DeckEditView :clickEvent="openModal" v-if="joinType == 2"/>
         </div>
       </div>
       <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          v-on:click="joinType = 1"
-        >
-          Close
+        <button type="button" class="btn btn-primary transitionBtn" v-on:click="joinType = 2" v-if="joinType == 1">
+          <p >編集へ</p>
         </button>
-        <button type="button" class="btn btn-primary" v-on:click="joinType = 2">
-          Save changes
+        <button type="button" class="btn btn-primary transitionBtn" v-on:click="joinType = 1" v-if="joinType == 2">
+          <p>デッキ一覧へ</p>
         </button>
       </div>
     </div>
@@ -59,20 +51,21 @@ function init() {
   store.dispatch("addCardListAsync");
 
   store.commit("createUserData");
+  console.log( "db:",store.state.db_deck_list );
 }
 init();
 
-console.log( "db:",store.state.db_deck_list );
-const joinType = ref(1);
+const joinType = ref(0);
 
 const showContent = ref(false);
 const openModal = () => {
-  console.log(store.state.currentDeck);
+  joinType.value = 1;
   showContent.value = true;
+  console.log("open")
 };
 
 const closeModal = () => {
-  console.log("close");
+  joinType.value = 0;
   showContent.value = false;
 };
 </script>
@@ -86,18 +79,6 @@ const closeModal = () => {
   color: #2c3e50;
 }
 
-nav {
-  padding: 10px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #b542b9;
-    }
-  }
-}
 #overlay {
   /* 要素を重ねた時の順番 */
   z-index: 1;
@@ -114,6 +95,9 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
+  .transitionBtn{
+    height: 35px;
+  }
 }
 #content {
   z-index: 2;

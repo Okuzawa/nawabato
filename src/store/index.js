@@ -30,11 +30,11 @@ export default createStore({
         
         let deckList = [];
         deckList.push({name: "スターターデッキ", deck: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]});
-        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
-        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
-        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
-        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
-        deckList.push({name: "temp", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        deckList.push({name: "デッキ1", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        deckList.push({name: "デッキ2", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        deckList.push({name: "デッキ3", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        deckList.push({name: "デッキ4", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        deckList.push({name: "デッキ5", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
         let json = JSON.stringify(deckList);
         localStorage.setItem('tb_deck', json);
         state.db_deck_list = JSON.parse(json);
@@ -45,6 +45,12 @@ export default createStore({
         let json = localStorage.getItem('tb_deck');
         state.db_deck_list = JSON.parse(json);
       }
+    },
+    SaveDeck(state,{name,deck}) {
+      state.db_deck_list[state.currentDeck].deck = deck;
+      state.db_deck_list[state.currentDeck].name = name;
+      let json = JSON.stringify(state.db_deck_list);
+      localStorage.setItem('tb_deck', json);
     }
   },
   actions: {

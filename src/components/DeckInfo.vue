@@ -2,12 +2,14 @@
   <div class="container">
     <div v-for="(value, key, index) in cardList" v-bind:key="index">
       <CardItem
+        :id="value.id"
         :name="value.name"
         :count="value.count"
         :cost="value.cost"
         :map="value.map"
         :block="this.$store.state.blocks[1]"
         :sp_block="this.$store.state.blocks[2]"
+        @click="pickCard(key)"
       />
     </div>
   </div>
@@ -36,6 +38,9 @@ export default {
     loadDeck: function (deck) {
       this.cardList = deck;
     },
+    pickCard: function (index){
+      this.$emit('pick', index);
+    }
   },
 };
 </script>
@@ -43,14 +48,15 @@ export default {
 <style scoped>
 .container {
   background-color: #eeffeb;
-  width: 550px;
-  height: 182px;
+  width: 280px;
+  height: 400px;
   border: solid 5px #260064;
-  padding: 0px;
   display: flex;
-  overflow-x: scroll;
+  flex-wrap: wrap;
+  overflow-y: scroll;
+  padding: 0px 0px;
 }
-.CardItem {
-  width: 20%;
+.container::-webkit-scrollbar {
+  display: none;
 }
 </style>

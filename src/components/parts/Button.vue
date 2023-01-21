@@ -1,6 +1,6 @@
 <template>
   <div class="hogeButton" >
-    <button class="temp" @click="onFocus();$emit('clickEvent')">
+    <button class="temp btn btn-outline-secondary" @click="onFocus();$emit('clickEvent')">
       <p>hoge</p>
     </button>
   </div>
@@ -34,4 +34,8 @@ export default {
 </script>
 
 <style scoped>
+.btn-outline-secondary.disabled{
+  background-color: #00000000 !important;
+  color: #080808 !important;
+}
 </style>>

@@ -12,6 +12,9 @@
         :map="value.map"
         :block="this.$store.state.blocks[1]"
         :sp_block="this.$store.state.blocks[2]"
+        @click="change(value.id)"
+        :select="{ select: -1 != this.myDeck.indexOf(value) ? true:false }"
+        :isActiv="{ enabled: -1 != this.myDeck.indexOf(value) ? false:true }"
       />
     </div>
   </div>
@@ -25,12 +28,18 @@ export default {
   components: {
     CardItem,
   },
+  props: {
+    myDeck: Array,
+  },
   data() {
     return {
     };
   },
   methods: {
-  },
+    change: function (id){
+      this.$emit('change', id);
+    }
+  }
 };
 </script>
 
@@ -38,7 +47,7 @@ export default {
 .container {
   background-color: #eeffeb;
   width: 550px;
-  height: 500px;
+  height: 600px;
   border: solid 5px #260064;
   display: flex;
   flex-wrap: wrap;
