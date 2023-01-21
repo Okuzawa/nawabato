@@ -3,6 +3,7 @@
 
   <label>選択中のデッキ ： {{ store.state.db_deck_list[store.state.currentDeck].name }}</label>
   <button v-on:click="openModal">デッキ変更</button>
+  <button @click="resetData">データ削除</button>
 
   <div id="overlay" v-show="showContent">
     <div id="content">
@@ -61,13 +62,15 @@ const showContent = ref(false);
 const openModal = () => {
   joinType.value = 1;
   showContent.value = true;
-  console.log("open")
 };
-
 const closeModal = () => {
   joinType.value = 0;
   showContent.value = false;
 };
+const resetData = () =>{
+  localStorage.removeItem("userData");
+  localStorage.removeItem("tb_deck");
+}
 </script>
 
 <style lang="scss" >
