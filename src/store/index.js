@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     isLoading: true,
+    user_id: 0,
     currentDeck: 0,
     db_deck_list: [],
     blocks: [],
@@ -24,9 +25,11 @@ export default createStore({
       state.cardList.push({ id: data.id, name: data.name, count: data.count, cost: data.cost, map: JSON.parse("[" + data.map + "]") });
     },
     createUserData: function (state) {
-      if (localStorage.getItem("userData") == null) {
+      if (localStorage.getItem("user_id") == null) {
         console.log("新規作成")
-        localStorage.setItem("userData", "true")
+        let userId = Math.floor(Math.random() * 899999+100000);
+        state.user_id = userId;
+        localStorage.setItem("user_id", userId)
         
         let deckList = [];
         deckList.push({name: "スターターデッキ", deck: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]});
@@ -35,15 +38,17 @@ export default createStore({
         deckList.push({name: "デッキ3", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
         deckList.push({name: "デッキ4", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
         deckList.push({name: "デッキ5", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
+        state.db_deck_list = deckList;
         let json = JSON.stringify(deckList);
         localStorage.setItem('tb_deck', json);
-        state.db_deck_list = JSON.parse(json);
       }
       else {
         console.log("データ取得")
 
         let json = localStorage.getItem('tb_deck');
         state.db_deck_list = JSON.parse(json);
+        json = localStorage.getItem('user_id');
+        state.user_id = JSON.parse(json);
       }
     },
     SaveDeck(state,{name,deck}) {

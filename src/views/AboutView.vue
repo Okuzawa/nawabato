@@ -55,6 +55,16 @@ export default {
         messageList.push(result.data());
       });
     });
+
+    // 新しいドキュメントが作成された際に、最新の１件のみを取得するクエリ
+    // messageRef.orderBy("created", "desc").limit(1).onSnapshot(function (querySnapshot) {
+    // querySnapshot.forEach(function(queryDocSnapshot) {
+    //     var data = queryDocSnapshot.data();
+    //     messageList.push(data);
+    //     console.log(data);
+    //     console.log(messageList);
+    //   });
+    // });
   },
   methods: {
     sendMessage: function () {
