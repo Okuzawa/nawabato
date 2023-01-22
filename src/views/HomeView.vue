@@ -21,6 +21,9 @@
         <input type="button" value="入室" @click="enterRoom" />
       </div>
     </div>
+    <div style="color: red">
+      {{ message }}
+    </div>
   </div>
 </template>
 
@@ -34,6 +37,7 @@ export default {
     roomId: "",
     isJoined: false,
     socket: io("http://localhost:3031"),
+    message: "",
   }),
   created() {
     this.socket.on("connect", () => {
@@ -43,12 +47,21 @@ export default {
   methods: {
     createRoom() {
       this.socket.emit("create", this.userName);
+      this.message = "";
+    },
+    enterRoom() {
+      this.socket.emit("enter", this.userName, this.roomId);
+      this.message = "";
     },
   },
   mounted() {
     this.socket.on("updateRoom", (room) => {
       this.isJoined = true;
       this.roomId = room.id;
+      this.message = "";
+    });
+    this.socket.on("notifyError", (error) => {
+      this.message = error;
     });
   },
 };

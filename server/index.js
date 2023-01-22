@@ -1,7 +1,7 @@
 const http = require("http").createServer();
 const io = require("socket.io")(http, {
   cors: {
-    origin: ["http://localhost:8080"],
+    origin: ["http://192.168.2.104:8080"],
   },
 });
 
@@ -11,6 +11,20 @@ const rooms = [];
 const users = [];
 
 io.on("connection", (socket) => {
+  // 部屋に入室する
+  socket.on("enter", (userName, roomId) => {
+    const roomIndex = rooms.findIndex((r) => r.id == roomId);
+    if (roomIndex == -1) {
+      io.to(socket.id).emit("notifyError", "部屋が見つかりません");
+      return;
+    }
+    const user = { id: socket.id, name: userName, roomId };
+    rooms[roomIndex].users.push(user);
+    users.push(user);
+    socket.join(rooms[roomIndex].id);
+    io.to(socket.id).emit("updateRoom", rooms[roomIndex]);
+  });
+
   // 部屋を新しく建てる
   socket.on("create", (userName) => {
     // ランダムな部屋IDを生成する(メソッドの中身は以下参照)
