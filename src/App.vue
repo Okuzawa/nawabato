@@ -1,10 +1,9 @@
 <template>
   <h1>ナワバトラー</h1>
-
+  <AboutView/>
   <label>選択中のデッキ ： {{ store.state.db_deck_list[store.state.currentDeck].name }}</label>
   <button v-on:click="openModal">デッキ変更</button>
   <button @click="resetData">データ削除</button>
-
 
   <div id="overlay" v-show="showContent">
     <div id="content">
@@ -44,6 +43,7 @@ import src_orange_block from "./assets/image/blocks/orange_block.png";
 
 import DeckListView from "./views/DeckListView.vue";
 import DeckEditView from "./views/DeckEditView.vue";
+import AboutView from "./views/AboutView.vue";
 
 function init() {
   store.commit("addBlockSrc", { src: src_frame });
