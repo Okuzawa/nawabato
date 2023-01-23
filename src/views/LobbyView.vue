@@ -1,19 +1,24 @@
 <template>
   <div id="app">
-    <div class="users" v-if="isJoined">
-      <div>
-        <h5>あなた</h5>
-        <p>{{ userName }}さん</p>
+    <div v-if="isJoined">
+      <div class="users" >
+        <div>
+          <h5>あなた</h5>
+          <p>{{ userName }}さん</p>
+        </div>
+        <div>
+          <p>部屋番号</p>
+          <h5>{{ roomId }}</h5>
+        </div>
+        <div>
+          <h5>対戦相手</h5>
+          <p v-if="usersList.length == 2">
+            {{ usersList[enemyIndex].userName }}さん
+          </p>
+          <p v-else>まだいません</p>
+        </div>
       </div>
-      <div>
-        <p>部屋番号</p>
-        <h5>{{ roomId }}</h5>
-      </div>
-      <div>
-        <h5>対戦相手</h5>
-        <p v-if="messageList.length == 2">{{ messageList[OpponentIndex].userName }}さん</p>
-        <p v-else>まだいません</p>
-      </div>
+      <button @click="exitRoom">退出</button>
     </div>
     <div v-else>
       <div>
@@ -39,11 +44,9 @@
 </template>
 
 <script>
-import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 
-let roomsRef;
 let roomsDocRef;
 let userId;
 
@@ -55,23 +58,11 @@ export default {
     isJoined: false,
     message: "",
 
-    messageList:[],
-    OpponentIndex: 1,
-    opponentName: "",
+    usersList: [],
+    enemyIndex: 1,
+    enemyName: "",
   }),
-  created() {
-    const firebaseConfig = {
-      apiKey: "AIzaSyArEFrBMUMDHAYTjFJ2HhsHb__zIPYMfLc",
-      authDomain: "turf-war-ebf17.firebaseapp.com",
-      projectId: "turf-war-ebf17",
-      storageBucket: "turf-war-ebf17.appspot.com",
-      messagingSenderId: "1096461103992",
-      appId: "1:1096461103992:web:57b6f83644c9882d8d8e8d",
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    roomsRef = db.collection("rooms");
-  },
+  created() {},
   methods: {
     createRoom() {
       this.message = "";
@@ -86,11 +77,11 @@ export default {
       const room = {
         users: [{ userId: userId, userName: userName }],
       };
-      this.isJoined = true;
-      
-      roomsDocRef = roomsRef.doc(String(roomId));
+      roomsDocRef = this.$store.state.roomsRef.doc(String(roomId));
       roomsDocRef.set(room);
       this.loadRoomData();
+      
+      this.isJoined = true;
     },
     enterRoom() {
       this.message = "";
@@ -105,18 +96,18 @@ export default {
       let roomId = this.roomId;
       userId = this.$store.state.user_id;
       let userName = this.userName;
-      roomsDocRef = roomsRef.doc(String(roomId));
+      roomsDocRef = this.$store.state.roomsRef.doc(String(roomId));
 
       roomsDocRef.get().then((doc) => {
         if (doc.exists) {
           this.message = "";
           let users = doc.get("users");
-          if (2 > users.length) {
+          if (10 > users.length) {
             users.push({ userId: userId, userName: userName });
             roomsDocRef.update({ users });
-            this.isJoined = true;
             this.loadRoomData();
-            this.OpponentIndex = 0;
+            this.isJoined = true;
+            this.enemyIndex = 0;
           } else {
             this.message = "その部屋は満室です";
           }
@@ -130,17 +121,28 @@ export default {
       return id;
     },
     loadRoomData() {
-      let messageList = this.messageList;
-      roomsDocRef.onSnapshot(function (doc) {
-        // let source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-        // console.log(source," data: ",doc.data())
-        messageList.length = 0;
+      let json = JSON.stringify(this.roomId);
+      localStorage.setItem("buf_room_id", json);
+
+      let usersList = this.usersList;
+      roomsDocRef.onSnapshot((doc) => {
+        usersList.length = 0;
+        let source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+        console.log(source, " data: ", doc.data());
         let users = doc.get("users");
-        users.forEach(item => {
-          messageList.push(item);
-        });
+        if(users != null){
+            users.forEach((item) => {
+            usersList.push(item);
+            });
+          }
+          if(usersList == 0){this.exitRoom()}
       });
     },
+    exitRoom() {
+      roomsDocRef.delete();
+      this.isJoined = false;
+      console.log("exit")
+    }
   },
 };
 </script>

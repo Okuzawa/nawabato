@@ -1,4 +1,18 @@
 import { createStore } from 'vuex'
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/firestore";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyArEFrBMUMDHAYTjFJ2HhsHb__zIPYMfLc",
+  authDomain: "turf-war-ebf17.firebaseapp.com",
+  projectId: "turf-war-ebf17",
+  storageBucket: "turf-war-ebf17.appspot.com",
+  messagingSenderId: "1096461103992",
+  appId: "1:1096461103992:web:57b6f83644c9882d8d8e8d",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 export default createStore({
   state: {
@@ -7,7 +21,8 @@ export default createStore({
     currentDeck: 0,
     db_deck_list: [],
     blocks: [],
-    cardList: []
+    cardList: [],
+    roomsRef: null,
   },
   getters: {
     getBlockSrc: (state) => (index) => {
@@ -24,7 +39,7 @@ export default createStore({
     addCardList(state, { data }) {
       state.cardList.push({ id: data.id, name: data.name, count: data.count, cost: data.cost, map: JSON.parse("[" + data.map + "]") });
     },
-    createUserData: function (state) {
+    createUserData(state) {
       if (localStorage.getItem("user_id") == null) {
         console.log("新規作成")
         let userId = Math.floor(Math.random() * 899999+100000);
@@ -56,6 +71,25 @@ export default createStore({
       state.db_deck_list[state.currentDeck].name = name;
       let json = JSON.stringify(state.db_deck_list);
       localStorage.setItem('tb_deck', json);
+    },
+    initFirestore(state) {
+      
+      state.roomsRef = db.collection("rooms");
+    },
+    loadBufRoomId () {
+      let json = localStorage.getItem("buf_room_id");
+      let bufRoomId = JSON.parse(json);
+      console.log("buf_room_id",bufRoomId);
+      if (bufRoomId == null){
+        console.log("途中退出した部屋はありません")
+      }
+      else{
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        db.collection("rooms").doc(String(bufRoomId)).delete();
+        console.log("途中退出した部屋があったため、退出処理をしました")
+        localStorage.removeItem("buf_room_id");
+      }
     }
   },
   actions: {

@@ -53,6 +53,8 @@ function init() {
   store.dispatch("addCardListAsync");
 
   store.commit("createUserData");
+  store.commit("loadBufRoomId");
+  store.commit("initFirestore");
 }
 init();
 
@@ -68,7 +70,7 @@ const closeModal = () => {
   showContent.value = false;
 };
 const resetData = () =>{
-  localStorage.removeItem("userData");
+  localStorage.removeItem("user_id");
   localStorage.removeItem("tb_deck");
 }
 </script>
