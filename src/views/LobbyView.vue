@@ -1,24 +1,17 @@
 <template>
   <div id="app">
-    <div v-if="isJoined">
+    <div v-if="roomStatus == '準備中'">
       <div class="users" >
-        <div>
-          <h5>あなた</h5>
-          <p>{{ userName }}さん</p>
-        </div>
-        <div>
-          <p>部屋番号</p>
-          <h5>{{ roomId }}</h5>
-        </div>
-        <div>
-          <h5>対戦相手</h5>
-          <p v-if="usersList.length == 2">
-            {{ usersList[enemyIndex].userName }}さん
-          </p>
-          <p v-else>まだいません</p>
-        </div>
+        <h5>部屋番号:{{ roomId }}</h5>
+        <ul v-for="(value, key, index) in usersList" v-bind:key="index">
+          {{value.userName}}:{{value.userStatus}}
+        </ul>
       </div>
+      <button @click="writeStatus('準備OK')">準備OK</button>
       <button @click="exitRoom">退出</button>
+    </div>
+    <div v-else-if="roomStatus == '準備OK'">
+      ゲーム
     </div>
     <div v-else>
       <div>
@@ -55,14 +48,13 @@ export default {
     userName: "",
     joinType: 1,
     roomId: "",
-    isJoined: false,
+    roomStatus: "",
     message: "",
 
     usersList: [],
     enemyIndex: 1,
     enemyName: "",
   }),
-  created() {},
   methods: {
     createRoom() {
       this.message = "";
@@ -74,14 +66,14 @@ export default {
       this.roomId = roomId;
       userId = this.$store.state.user_id;
       let userName = this.userName;
-      const room = {
-        users: [{ userId: userId, userName: userName }],
+      let status = "準備中";
+      const data = {
+        users: [{ userId: userId, userName: userName, userStatus: status }],
       };
       roomsDocRef = this.$store.state.roomsRef.doc(String(roomId));
-      roomsDocRef.set(room);
+      roomsDocRef.set(data);
       this.loadRoomData();
-      
-      this.isJoined = true;
+      this.roomStatus = '準備中';
     },
     enterRoom() {
       this.message = "";
@@ -97,17 +89,16 @@ export default {
       userId = this.$store.state.user_id;
       let userName = this.userName;
       roomsDocRef = this.$store.state.roomsRef.doc(String(roomId));
-
+      let status = "準備中";
+      this.enemyIndex = 0;
       roomsDocRef.get().then((doc) => {
         if (doc.exists) {
-          this.message = "";
           let users = doc.get("users");
-          if (10 > users.length) {
-            users.push({ userId: userId, userName: userName });
+          if (2 > users.length) {
+            users.push({ userId: userId, userName: userName, userStatus: status });
             roomsDocRef.update({ users });
             this.loadRoomData();
-            this.isJoined = true;
-            this.enemyIndex = 0;
+            this.roomStatus = '準備中';
           } else {
             this.message = "その部屋は満室です";
           }
@@ -127,21 +118,46 @@ export default {
       let usersList = this.usersList;
       roomsDocRef.onSnapshot((doc) => {
         usersList.length = 0;
-        let source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-        console.log(source, " data: ", doc.data());
+        // let source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+        // console.log(source, " data: ", doc.data());
+
         let users = doc.get("users");
         if(users != null){
             users.forEach((item) => {
-            usersList.push(item);
+              console.log(item);
+              usersList.push(item);
             });
-          }
-          if(usersList == 0){this.exitRoom()}
+        }
+        if(usersList.length == 0){ this.exitRoom() }
+        else if(usersList.length == 2){
+          this.setRoomStatus('準備OK');
+        }
       });
     },
     exitRoom() {
       roomsDocRef.delete();
-      this.isJoined = false;
+      this.roomStatus = "";
+      localStorage.removeItem("buf_room_id");
       console.log("exit")
+    },
+    setRoomStatus(status) {
+      console.log(status,this.usersList.every(userData=>userData.userStatus == status),this.roomStatus)
+      if( this.usersList.every(userData=>userData.userStatus == status ) ){
+        this.roomStatus = status
+        }
+    },
+    writeStatus(status) {
+      roomsDocRef.get().then((doc) => {
+        if (doc.exists) {
+          let users = doc.get("users");
+          users.forEach((userData)=>{
+            if(userData.userId == userId){ userData.userStatus = status; }
+          });
+          roomsDocRef.update({ users });
+        } else {
+          console.log("存在しない")
+        }
+      });
     }
   },
 };
@@ -152,12 +168,5 @@ export default {
   background-color: #e2fbfd;
   width: 150px;
   height: 30px;
-}
-.users {
-  display: flex;
-  justify-content: center;
-  div {
-    margin: 10px;
-  }
 }
 </style>
