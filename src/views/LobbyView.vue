@@ -124,7 +124,6 @@ export default {
         let users = doc.get("users");
         if(users != null){
             users.forEach((item) => {
-              console.log(item);
               usersList.push(item);
             });
         }
@@ -141,7 +140,6 @@ export default {
       console.log("exit")
     },
     setRoomStatus(status) {
-      console.log(status,this.usersList.every(userData=>userData.userStatus == status),this.roomStatus)
       if( this.usersList.every(userData=>userData.userStatus == status ) ){
         this.roomStatus = status
         }
