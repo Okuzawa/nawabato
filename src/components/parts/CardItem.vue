@@ -3,9 +3,12 @@
     <button
       class="card-item btn btn-outline-secondary"
       :class="{ active: isSelect }"
-      @click="OnClick();$emit('clickEvent')"
+      @click="
+        OnClick();
+        $emit('clickEvent');
+      "
     >
-      <canvas ref="cardCanvas"></canvas>
+      <BlockTable BlockTable :contents="cardMap" class="cardMap"/>
       <p class="name">{{ name }}</p>
       <div class="count">
         <p>{{ count }}</p>
@@ -19,8 +22,13 @@
 </template>
 
 <script>
+import BlockTable from "@/components/parts/BlockTable.vue";
+
 export default {
   name: "CardItem",
+  components: {
+    BlockTable,
+  },
   props: {
     id: Number,
     name: String,
@@ -30,9 +38,9 @@ export default {
     block: String,
     sp_block: String,
 
-    isActiv: {default: true},
-    select: {default: false},
-    clickEvent:Function,
+    isActiv: { default: true },
+    select: { default: false },
+    clickEvent: Function,
   },
   data() {
     return {
@@ -40,45 +48,30 @@ export default {
       isSelect: false,
     };
   },
-  mounted() {
-    this.ctx = this.$refs.cardCanvas.getContext("2d");
-    this.imageDraw(this.map);
-
-    if(this.id == 0) return;
-    this.enabled = this.isActiv.enabled;
-    if(this.select.select != this.isSelect) this.isSelect = this.select.select;
-  },
-  watch: {
-    map: function () {
-      this.imageDraw(this.map);
+  computed: {
+    cardMap: {
+      get: function () {
+        let array = new Array(8);
+        for (let y = 0; y < 8; y++) {
+          array[y] = new Array(8).fill(0);
+        }
+        let index = 0;
+        for (let y = 0; y < 8; y++) {
+          for (let x = 0; x < 8; x++) {
+            array[y][x] = this.map[index];
+            index++;
+          }
+        }
+        return array;
+      },
     },
+  },
+  mounted() {
+    if (this.id == 0) return;
+    this.enabled = this.isActiv.enabled;
+    if (this.select.select != this.isSelect) this.isSelect = this.select.select;
   },
   methods: {
-    imageDraw: function (map) {
-      let index = 0;
-      for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-          let image = new Image();
-          switch (map[index]) {
-            case 0:
-              image.src = this.$store.state.blocks[0];
-              break;
-            case 1:
-              image.src = this.block;
-              break;
-            case 2:
-              image.src = this.sp_block;
-              break;
-            default:
-              break;
-          }
-          image.onload = () => {
-            this.ctx.drawImage(image, x * 36 + 6, y * 18 + 3, 36, 18);
-          };
-          index++;
-        }
-      }
-    },
     OnClick: function () {
       if (!this.enabled) return;
       if (this.isSelect) this.isSelect = false;
@@ -92,11 +85,9 @@ export default {
 .card-item {
   width: 90px;
   height: 150px;
-  canvas {
-    background-color: #a7a6a6;
-    width: 80px;
-    height: 80px;
-    margin: 0px -10px;
+  .cardMap {
+    transform: scale(0.3);
+    margin: -85px -95px;
   }
   .name {
     font-size: 0.5em;

@@ -12,7 +12,7 @@
         :map="value.map"
         :block="store.state.blocks[1]"
         :sp_block="store.state.blocks[2]"
-        :enabled="false"
+        :isActiv="false"
       />
     </div>
   </div>

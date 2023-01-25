@@ -1,7 +1,10 @@
 <template>
   <h1>ナワバトラー</h1>
-  <LobbyView/>
-  <label>選択中のデッキ ： {{ store.state.db_deck_list[store.state.currentDeck].name }}</label>
+  <LobbyView />
+  <label
+    >選択中のデッキ ：
+    {{ store.state.db_deck_list[store.state.currentDeck].name }}</label
+  >
   <button v-on:click="openModal">デッキ変更</button>
   <button @click="resetData">データ削除</button>
 
@@ -10,22 +13,36 @@
       <div class="modal-header">
         <h5 class="modal-title" v-if="joinType == 1">デッキ一覧</h5>
         <h5 class="modal-title" v-if="joinType == 2">デッキ編集</h5>
-        <button type="button" class="btn-close" v-on:click="closeModal"></button>
+        <button
+          type="button"
+          class="btn-close"
+          v-on:click="closeModal"
+        ></button>
       </div>
       <div class="modal-body">
         <div v-if="store.state.isLoading">
-          <p >読み込み中</p>
+          <p>読み込み中</p>
         </div>
         <div v-else id="top-list">
-          <DeckListView v-if="joinType == 1"/>
-          <DeckEditView :clickEvent="openModal" v-if="joinType == 2"/>
+          <DeckListView v-if="joinType == 1" />
+          <DeckEditView :clickEvent="openModal" v-if="joinType == 2" />
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary transitionBtn" v-on:click="joinType = 2" v-if="joinType == 1">
-          <p >編集へ</p>
+        <button
+          type="button"
+          class="btn btn-primary transitionBtn"
+          v-on:click="joinType = 2"
+          v-if="joinType == 1"
+        >
+          <p>編集へ</p>
         </button>
-        <button type="button" class="btn btn-primary transitionBtn" v-on:click="joinType = 1" v-if="joinType == 2">
+        <button
+          type="button"
+          class="btn btn-primary transitionBtn"
+          v-on:click="joinType = 1"
+          v-if="joinType == 2"
+        >
           <p>デッキ一覧へ</p>
         </button>
       </div>
@@ -37,9 +54,9 @@
 import { ref } from "vue";
 import store from "./store";
 
-import src_frame from "./assets/image/blocks/frame.png";
-import src_yellow_block from "./assets/image/blocks/yellow_block.png";
-import src_orange_block from "./assets/image/blocks/orange_block.png";
+import src_frame from "@/assets/image/blocks/frame.png";
+import src_yellow_block from "@/assets/image/blocks/yellow_block.png";
+import src_orange_block from "@/assets/image/blocks/orange_block.png";
 
 import DeckListView from "./views/DeckListView.vue";
 import DeckEditView from "./views/DeckEditView.vue";
@@ -69,10 +86,10 @@ const closeModal = () => {
   joinType.value = 0;
   showContent.value = false;
 };
-const resetData = () =>{
+const resetData = () => {
   localStorage.removeItem("user_id");
   localStorage.removeItem("tb_deck");
-}
+};
 </script>
 
 <style lang="scss" >
@@ -100,7 +117,7 @@ const resetData = () =>{
   display: flex;
   align-items: center;
   justify-content: center;
-  .transitionBtn{
+  .transitionBtn {
     height: 35px;
   }
 }
