@@ -47,7 +47,7 @@ export default createStore({
         localStorage.setItem("user_id", userId)
         
         let deckList = [];
-        deckList.push({name: "スターターデッキ", deck: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]});
+        deckList.push({name: "スターターデッキ", deck: [6,34,159,13,45,137,22,52,141,28,55,103,40,56,92]});
         deckList.push({name: "デッキ1", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
         deckList.push({name: "デッキ2", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
         deckList.push({name: "デッキ3", deck: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]});
