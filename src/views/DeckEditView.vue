@@ -7,7 +7,7 @@
     <div class="edit">
       <h4>マス合計:{{totalCount}}</h4>
       <div v-if="editType == 1">
-        <DeckInfo :deck="loadDeck" @pick="pickUp" class="deck-list"/>
+        <DeckInfo :deck="myDeck" @pick="pickUp" class="deck-list"/>
         <button type="button" class="btn btn-success" @click="saveDeck">保存</button>
       </div>
       <div v-if="editType == 2">
@@ -40,50 +40,34 @@ export default {
     };
   },
   methods: {
-    getTotalCount: function(deck){
-      let totalCount = 0;
-      deck.forEach(item=>{
-        totalCount += item.count;
-      });
-      return totalCount;
-    },
     pickUp: function(index){
       this.selectIndex = index;
       this.editType = 2;
     },
     changeCard: function(id){
-      let data = this.$store.getters.getCardList(id)
-      if(id != 0 && this.myDeck.indexOf(data) != -1) return;
-      this.myDeck[this.selectIndex] = data;
+      let card = this.$store.getters.findCardById(id)
+      if(id != 0 && this.myDeck.indexOf(card) != -1) return;
+      this.myDeck[this.selectIndex] = card;
       this.editType = 1;
-      this.totalCount = this.getTotalCount(this.myDeck);
+      this.totalCount = this.$store.getters.getTotalCount(this.myDeck);
+    },
+    loadDeck: function () {
+      let deck = this.$store.state.tb_deckList[this.$store.state.currentDeck].deck;
+      this.myDeck = this.$store.getters.findCardsById(deck);
+      this.totalCount = this.$store.getters.getTotalCount(this.myDeck);
     },
     saveDeck: function(){
       this.clickEvent();
-      let cardIDList=[];
-      this.myDeck.forEach(item=>{
-        cardIDList.push(item.id);
+      let deck=[];
+      this.myDeck.forEach(card=>{
+        deck.push(card.id);
       });
-      this.$store.commit("SaveDeck", { name: this.deckName, deck:cardIDList });
+      this.$store.commit("saveDeck", { name: this.deckName, deck:deck });
     }
   },
-  computed: {
-    loadDeck: {
-      get: function () {
-        return this.myDeck;
-      },
-      set: function (id) {
-        this.myDeck.push(this.$store.getters.getCardList(id));
-      },
-    },
-  },
-  mounted: function(){
-    this.$store.state.db_deck_list[this.$store.state.currentDeck].deck.
-    forEach(id => {
-      this.loadDeck = id;
-    });
-    this.deckName = this.$store.state.db_deck_list[this.$store.state.currentDeck].name;
-    this.totalCount = this.getTotalCount(this.myDeck);
+  created() {
+    this.loadDeck()
+    this.deckName = this.$store.state.tb_deckList[this.$store.state.currentDeck].name;
   }
 };
 </script>

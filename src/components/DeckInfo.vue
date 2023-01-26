@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div v-for="(value, key, index) in cardList" v-bind:key="index">
+    <div v-for="(value, key, index) in deck" v-bind:key="index">
       <CardItem
         :id="value.id"
         :name="value.name"
@@ -26,18 +26,7 @@ export default {
   props: {
     deck: Array,
   },
-  data() {
-    return {
-      cardList: [],
-    };
-  },
-  mounted() {
-    this.loadDeck(this.deck);
-  },
   methods: {
-    loadDeck: function (deck) {
-      this.cardList = deck;
-    },
     pickCard: function (index){
       this.$emit('pick', index);
     }

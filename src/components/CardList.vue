@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div
-      v-for="(value, key, index) in this.$store.state.cardList"
+      v-for="(value, key, index) in this.$store.state.ms_card"
       v-bind:key="index"
     >
       <CardItem
@@ -10,8 +10,8 @@
         :count="value.count"
         :cost="value.cost"
         :map="value.map"
-        :block="this.$store.state.blocks[1]"
-        :sp_block="this.$store.state.blocks[2]"
+        :block="this.$store.getters.getBlockSrc(1)"
+        :sp_block="this.$store.getters.getBlockSrc(2)"
         @click="change(value.id)"
         :select="{ select: -1 != this.myDeck.indexOf(value) ? true:false }"
         :isActiv="{ enabled: -1 != this.myDeck.indexOf(value) ? false:true }"
@@ -30,10 +30,6 @@ export default {
   },
   props: {
     myDeck: Array,
-  },
-  data() {
-    return {
-    };
   },
   methods: {
     change: function (id){

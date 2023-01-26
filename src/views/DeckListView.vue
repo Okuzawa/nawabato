@@ -1,19 +1,19 @@
 <template>
   <div class="deckList">
     <h4>
-      {{this.$store.state.db_deck_list[this.$store.state.currentDeck].name}}
+      {{this.$store.state.tb_deckList[this.$store.state.currentDeck].name}}
       マス合計：{{ totalCount }}
     </h4>
     <div class="list">
       <div>
         <div
           class="name"
-          v-for="(value, key, index) in this.$store.state.db_deck_list"
+          v-for="(value, key, index) in this.$store.state.tb_deckList"
           :key="index"
         >
-          <ul class="btn btn-outline-secondary" @click="selectDeck(key)">
+          <button class="btn btn-outline-secondary" @click="selectDeck(key)">
             <p>{{ value.name }}</p>
-          </ul>
+          </button>
         </div>
       </div>
       <Deck :deck="myDeck" />
@@ -29,7 +29,6 @@ export default {
   components: {
     Deck,
   },
-  props: {},
   data() {
     return {
       totalCount: 0,
@@ -38,23 +37,13 @@ export default {
   },
   methods: {
     loadDeck: function () {
-      this.myDeck.splice(0);
-      let cardList = this.$store.state.db_deck_list[this.$store.state.currentDeck].deck;
-      cardList.forEach((id) =>
-        this.myDeck.push(this.$store.getters.getCardList(id))
-      );
-      this.totalCount = this.getTotalCount(this.myDeck)
+      let deck = this.$store.state.tb_deckList[this.$store.state.currentDeck].deck;
+      this.myDeck = this.$store.getters.findCardsById(deck);
+      this.totalCount = this.$store.getters.getTotalCount(this.myDeck);
     },
     selectDeck: function (index) {
       this.$store.state.currentDeck = index;
       this.loadDeck();
-    },
-    getTotalCount: function (deck) {
-      let totalCount = 0;
-      deck.forEach((item) => {
-        totalCount += item.count;
-      });
-      return totalCount;
     },
   },
   created() {
@@ -69,11 +58,11 @@ export default {
     display: flex;
     justify-content: center;
     .name {
+      background-color: #daf9fc;
       display: block;
     }
   }
-  ul {
-    background-color: #effeff;
+  button {
     width: 85px;
     height: 30px;
     margin: 0px 0px;
@@ -81,7 +70,6 @@ export default {
     p {
       white-space: nowrap;
       font-size: 50%;
-      color: black;
       margin: 5px 0px;
     }
   }

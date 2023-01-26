@@ -3,7 +3,7 @@
   <LobbyView />
   <label
     >選択中のデッキ ：
-    {{ store.state.db_deck_list[store.state.currentDeck].name }}</label
+    {{ store.state.tb_deckList[store.state.currentDeck].name }}</label
   >
   <button v-on:click="openModal">デッキ変更</button>
   <button @click="resetData">データ削除</button>
@@ -68,10 +68,10 @@ function init() {
   store.commit("addBlockSrc", { src: src_orange_block });
 
   store.dispatch("addCardListAsync");
+  store.dispatch("addStageListAsync");
 
   store.commit("createUserData");
-  store.commit("loadBufRoomId");
-  store.commit("initFirestore");
+  store.commit("eraseBufRoom");
 }
 init();
 

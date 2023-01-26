@@ -3,7 +3,7 @@
   <tbody>
     <tr v-for="(row, key, index) in board" :key="index">
       <td v-for="(cell, key, index) in row" v-bind:class="'block-type-' + cell" :key="index">
-        <img :src = "this.$store.state.blocks[cell]" width="30" height="30">
+        <img :src = "this.$store.getters.getBlockSrc(cell)" width="30" height="30">
       </td>
     </tr>
   </tbody>

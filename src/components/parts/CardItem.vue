@@ -2,7 +2,7 @@
   <div class="CardItem">
     <button
       class="card-item btn btn-outline-secondary"
-      :class="{ active: isSelect }"
+      :class="{ active: isSelect,disabled:isDisabled }"
       @click="
         OnClick();
         $emit('clickEvent');
@@ -39,6 +39,7 @@ export default {
     sp_block: String,
 
     isActiv: { default: true },
+    isDisabled: { default: false },
     select: { default: false },
     clickEvent: Function,
   },
@@ -51,18 +52,7 @@ export default {
   computed: {
     cardMap: {
       get: function () {
-        let array = new Array(8);
-        for (let y = 0; y < 8; y++) {
-          array[y] = new Array(8).fill(0);
-        }
-        let index = 0;
-        for (let y = 0; y < 8; y++) {
-          for (let x = 0; x < 8; x++) {
-            array[y][x] = this.map[index];
-            index++;
-          }
-        }
-        return array;
+        return this.$store.getters.splitArray(this.map,8);
       },
     },
   },

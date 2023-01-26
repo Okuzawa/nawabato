@@ -10,9 +10,9 @@
         :count="value.count"
         :cost="value.cost"
         :map="value.map"
-        :block="store.state.blocks[1]"
-        :sp_block="store.state.blocks[2]"
-        :isActiv="false"
+        :block="store.getters.getBlockSrc(1)"
+        :sp_block="store.getters.getBlockSrc(2)"
+        :isDisabled="{disabled:false}"
       />
     </div>
   </div>
@@ -28,7 +28,7 @@ const props = defineProps({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .container {
   background-color: #eeffeb;
   width: 280px;
