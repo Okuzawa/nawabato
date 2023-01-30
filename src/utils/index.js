@@ -20,8 +20,18 @@ function splitArray(array, part) {
     return tmp;
 }
 
+function shuffle(array) {
+    const cloneArray = [...array];
+    for (let i = cloneArray.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1)); // 0 から i のランダムなインデックス
+        [cloneArray[i], cloneArray[j]] = [cloneArray[j], cloneArray[i]]; // 要素を入れ替えます
+    }
+    return cloneArray
+}
+
 export default {
     getTotalCount,
     create2DArray,
     splitArray,
+    shuffle,
 };

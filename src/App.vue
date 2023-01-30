@@ -1,4 +1,5 @@
 <template>
+<button @click="store.state.gameMainPhase = 2">debug</button>
   <div v-if="store.state.gameMainPhase == 0">
     <h2>ナワバトラー</h2>
     <HomeView />
@@ -10,8 +11,8 @@
     <DeckSelectView/>
   </div>
   <div v-else-if="store.state.gameMainPhase == 2">
-    <!-- <GameView /> -->
     <h2>ゲーム画面</h2>
+    <GameView />
   </div>
 </template>
 
@@ -33,6 +34,7 @@ import LobbyView from "./views/LobbyView.vue";
 import HomeView from "./views/HomeView.vue";
 import DeckManagerView from "./views/DeckManagerView.vue";
 import DeckSelectView from "./views/DeckSelectView.vue";
+import GameView from "./views/GameView.vue";
 
 function init() {
   store.commit("addBlockSrc", { src: src_frame });

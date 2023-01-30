@@ -126,7 +126,7 @@ export default createStore({
         .then(function (json) {
           for (let i in json) {context.commit("addStageList", { data: json[i] })}
         })
-        .then(()=>context.state.stageObj = context.state.ms_stage[0]);
+        .then(()=>context.state.stageObj = context.state.ms_stage[1]);
     },
   }
 })
