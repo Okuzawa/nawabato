@@ -5,11 +5,19 @@
       <div class="card-body text-secondary">
         <h5 class="card-title">{{ store.state.myUserObj.userName }}</h5>
         <p class="card-text">{{ store.state.myUserObj.userStatus }}</p>
+        <div class="dropdown" v-if="store.state.myUserObj.userPrivilege == 'owner'">
+          <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            {{store.state.stageObj.name}}
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li v-for="(value, key, index) in store.state.ms_stage" :key="index"><a class="dropdown-item" @click="selectStage(key)">{{value.name}}</a></li>
+          </ul>
+        </div>
       </div>
     </div>
 
     <div>
-      <p>部屋番号</p>
+      <p>|部屋番号|</p>
       <h3>{{ store.state.roomId }}</h3>
     </div>
 
@@ -30,22 +38,10 @@
     </div>
     <div v-else><p>対戦相手がいません</p></div>
   </div>
-
-  <div class="list">
-    <div>
-      <div
-        class="name"
-        v-for="(value, key, index) in store.state.ms_stage"
-        :key="index"
-      >
-        <button class="btn btn-outline-secondary" @click="selectStage(key)">
-          <p>{{ value.name }}</p>
-        </button>
-      </div>
-    </div>
-    <BlockTable class="stagePreview" :contents="utils.splitArray(store.state.stageObj.map, store.state.stageSideLength)" />
+  <div>
+  <p>{{ store.state.stageObj.name }}</p>
+  <BlockTable class="stagePreview" :contents=" utils.splitArray(store.state.stageObj.map, store.state.stageSideLength)"/>
   </div>
-
   <button @click="chageStatus">{{ store.state.myUserObj.userStatus }}</button>
   <button @click="store.commit('eraseBufRoom')">退出</button>
 </template>
@@ -65,31 +61,35 @@ const loadRoomData = () => {
     // console.log(source, " data: ", doc.data());
 
     let users = doc.get("users");
-    if (users == null) {store.commit('eraseBufRoom');return;}
+    if (users == null) {
+      store.commit("eraseBufRoom");
+      return;
+    }
     store.state.stageObj = doc.get("stage");
     users.forEach((user) => usersList.push(user));
-    store.state.myUserObj = users[1-store.state.enemyIndex];
+    store.state.myUserObj = users[1 - store.state.enemyIndex];
     if (usersList.length == 2) {
       store.state.enemyUserObj = users[store.state.enemyIndex];
       startGame("準備OK");
     }
   });
-}
+};
 
 loadRoomData();
 
 const startGame = (status) => {
   if (store.state.users.every((userData) => userData.userStatus == status)) {
     store.state.gameMainPhase = 2;
+    selectStage(0)
   }
-}
+};
 const chageStatus = () => {
   if (store.state.myUserObj.userStatus == "準備中") {
     writeStatus("準備OK");
   } else if (store.state.myUserObj.userStatus == "準備OK") {
     writeStatus("準備中");
   }
-}
+};
 const writeStatus = (status) => {
   store.state.roomDocRef.get().then((doc) => {
     let users = doc.get("users");
@@ -98,13 +98,13 @@ const writeStatus = (status) => {
     });
     store.state.roomDocRef.update({ users });
   });
-}
+};
 
 const selectStage = (index) => {
   store.state.currentStage = index;
   store.state.stageObj = store.state.ms_stage[store.state.currentStage];
-  store.state.roomDocRef.update({stage: store.state.stageObj});
-}
+  store.state.roomDocRef.update({ stage: store.state.stageObj });
+};
 </script>
 
 <style lang="scss">
@@ -112,23 +112,15 @@ const selectStage = (index) => {
   display: flex;
   justify-content: center;
 }
-.list {
-  display: flex;
-  justify-content: center;
-  padding: 0;
-  button {
-    height: 30px;
-    width: 200px;
-    margin-right: -29rem;
-  }
-  .name {
-    display: block;
-  }
+.dropdown{
+  margin-top: -15px;
 }
 .stagePreview {
-  border: solid 5px #260064;
+  display: flex;
+  justify-content: center;
   transform: scale(0.3);
-  margin-top: -350px;
-  margin-right: -16rem;
+  margin-top: -370px;
+  margin-bottom: -330px;
+  padding: 0 10;
 }
 </style>

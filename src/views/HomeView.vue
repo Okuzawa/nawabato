@@ -48,6 +48,7 @@ const createRoom = () => {
         ],
       };
       store.commit("createServer", { roomId: roomId.value });
+      setMyUserData(data.users[0])
       store.state.roomDocRef.set(data);
       store.state.stageObj = store.state.ms_stage[store.state.currentStage];
       store.state.roomDocRef.update({stage: store.state.stageObj});
@@ -72,6 +73,7 @@ const enterRoom = () => {
               userStatus: userStatus.value,
               userPrivilege: userPrivilege.value,
             });
+            setMyUserData(users[1])
             store.state.roomDocRef.update({ users });
             initRoom();
           } 
@@ -79,6 +81,11 @@ const enterRoom = () => {
         } 
         else message.value = "その部屋は存在しません";
       });
+}
+
+const setMyUserData = (data) =>{
+  console.log(data)
+  store.state.myUserObj = data
 }
 
 const generateRoomId = () => {

@@ -1,16 +1,17 @@
 <template>
   <div v-if="store.state.gameMainPhase == 0">
-    <h1>ナワバトラー</h1>
+    <h2>ナワバトラー</h2>
     <HomeView />
     <DeckManagerView />
   </div>
   <div v-else-if="store.state.gameMainPhase == 1">
-    <h1>ロビー</h1>
+    <h2>ロビー</h2>
     <LobbyView />
+    <DeckSelectView/>
   </div>
   <div v-else-if="store.state.gameMainPhase == 2">
     <!-- <GameView /> -->
-    <h1>ゲーム画面</h1>
+    <h2>ゲーム画面</h2>
   </div>
 </template>
 
@@ -31,6 +32,7 @@ import src_null from "@/assets/image/blocks/null_block.png";
 import LobbyView from "./views/LobbyView.vue";
 import HomeView from "./views/HomeView.vue";
 import DeckManagerView from "./views/DeckManagerView.vue";
+import DeckSelectView from "./views/DeckSelectView.vue";
 
 function init() {
   store.commit("addBlockSrc", { src: src_frame });
