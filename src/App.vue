@@ -1,71 +1,47 @@
 <template>
-  <h1>ナワバトラー</h1>
-  <LobbyView />
-  <label
-    >選択中のデッキ ：
-    {{ store.state.tb_deckList[store.state.currentDeck].name }}</label
-  >
-  <button v-on:click="openModal">デッキ変更</button>
-  <button @click="resetData">データ削除</button>
-
-  <div id="overlay" v-show="showContent">
-    <div id="content">
-      <div class="modal-header">
-        <h5 class="modal-title" v-if="joinType == 1">デッキ一覧</h5>
-        <h5 class="modal-title" v-if="joinType == 2">デッキ編集</h5>
-        <button
-          type="button"
-          class="btn-close"
-          v-on:click="closeModal"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <div v-if="store.state.isLoading">
-          <p>読み込み中</p>
-        </div>
-        <div v-else id="top-list">
-          <DeckListView v-if="joinType == 1" />
-          <DeckEditView :clickEvent="openModal" v-if="joinType == 2" />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-primary transitionBtn"
-          v-on:click="joinType = 2"
-          v-if="joinType == 1"
-        >
-          <p>編集へ</p>
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary transitionBtn"
-          v-on:click="joinType = 1"
-          v-if="joinType == 2"
-        >
-          <p>デッキ一覧へ</p>
-        </button>
-      </div>
-    </div>
+  <div v-if="store.state.gameMainPhase == 0">
+    <h1>ナワバトラー</h1>
+    <HomeView />
+    <DeckManagerView />
+  </div>
+  <div v-else-if="store.state.gameMainPhase == 1">
+    <h1>ロビー</h1>
+    <LobbyView />
+  </div>
+  <div v-else-if="store.state.gameMainPhase == 2">
+    <!-- <GameView /> -->
+    <h1>ゲーム画面</h1>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
 import store from "./store";
 
 import src_frame from "@/assets/image/blocks/frame.png";
-import src_yellow_block from "@/assets/image/blocks/yellow_block.png";
-import src_orange_block from "@/assets/image/blocks/orange_block.png";
+import src_yellow from "@/assets/image/blocks/yellow_block.png";
+import src_orange from "@/assets/image/blocks/orange_block.png";
+import src_orange_fire from "@/assets/image/blocks/orange_fire_block.png";
+import src_sky from "@/assets/image/blocks/sky_block.png";
+import src_blue from "@/assets/image/blocks/blue_block.png";
+import src_blue_fire from "@/assets/image/blocks/blue_fire_block.png";
+import src_default from "@/assets/image/blocks/default_block.png";
+import src_null from "@/assets/image/blocks/null_block.png";
+// import src_null from "@/assets/image/blocks/frame_black.png";
 
-import DeckListView from "./views/DeckListView.vue";
-import DeckEditView from "./views/DeckEditView.vue";
 import LobbyView from "./views/LobbyView.vue";
+import HomeView from "./views/HomeView.vue";
+import DeckManagerView from "./views/DeckManagerView.vue";
 
 function init() {
   store.commit("addBlockSrc", { src: src_frame });
-  store.commit("addBlockSrc", { src: src_yellow_block });
-  store.commit("addBlockSrc", { src: src_orange_block });
+  store.commit("addBlockSrc", { src: src_yellow });
+  store.commit("addBlockSrc", { src: src_orange });
+  store.commit("addBlockSrc", { src: src_orange_fire });
+  store.commit("addBlockSrc", { src: src_sky });
+  store.commit("addBlockSrc", { src: src_blue });
+  store.commit("addBlockSrc", { src: src_blue_fire });
+  store.commit("addBlockSrc", { src: src_default });
+  store.commit("addBlockSrc", { src: src_null });
 
   store.dispatch("addCardListAsync");
   store.dispatch("addStageListAsync");
@@ -74,22 +50,6 @@ function init() {
   store.commit("eraseBufRoom");
 }
 init();
-
-const joinType = ref(0);
-
-const showContent = ref(false);
-const openModal = () => {
-  joinType.value = 1;
-  showContent.value = true;
-};
-const closeModal = () => {
-  joinType.value = 0;
-  showContent.value = false;
-};
-const resetData = () => {
-  localStorage.removeItem("user_id");
-  localStorage.removeItem("tb_deck");
-};
 </script>
 
 <style lang="scss" >
@@ -99,35 +59,5 @@ const resetData = () => {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-
-#overlay {
-  /* 要素を重ねた時の順番 */
-  z-index: 1;
-
-  /* 画面全体を覆う設定 */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-
-  /* 画面の中央に要素を表示させる設定 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  .transitionBtn {
-    height: 35px;
-  }
-}
-#content {
-  z-index: 2;
-  width: 100%;
-  padding: 1em;
-  background: #fff;
-}
-#top-list {
-  margin: 0px -100px;
 }
 </style>

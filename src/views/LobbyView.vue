@@ -1,195 +1,134 @@
 <template>
-  <div id="app">
-    <div v-if="roomStatus == '準備中'">
-      <div class="users">
-        <div class="card border-secondary" style="max-width: 15rem">
-          <div class="card-header">{{ userPrivilege }}</div>
-          <div class="card-body text-secondary">
-            <h5 class="card-title">{{ userName }}</h5>
-            <p class="card-text">{{ userStatus }}</p>
-          </div>
-        </div>
-        <div>
-          <p>部屋番号</p>
-          <h3>{{ roomId }}</h3>
-        </div>
-        <div v-if="this.$store.state.users.length == 2">
-          <div class="card border-secondary" style="max-width: 15rem">
-            <div class="card-header">{{ this.$store.state.users[enemyIndex].userPrivilege }}</div>
-            <div class="card-body text-secondary">
-              <h5 class="card-title">{{ this.$store.state.users[enemyIndex].userName }}</h5>
-              <p class="card-text"> {{ this.$store.state.users[enemyIndex].userStatus }}</p>
-            </div>
-          </div>
-        </div>
-        <div v-else><p>対戦相手がいません</p></div>
+  <div class="users">
+    <div class="card border-secondary" style="max-width: 15rem">
+      <div class="card-header">{{ store.state.myUserObj.userPrivilege }}</div>
+      <div class="card-body text-secondary">
+        <h5 class="card-title">{{ store.state.myUserObj.userName }}</h5>
+        <p class="card-text">{{ store.state.myUserObj.userStatus }}</p>
       </div>
-      <button @click="writeStatus('準備OK')">準備OK</button>
-      <button @click="exitRoom">退出</button>
     </div>
-    <div v-else-if="roomStatus == '準備OK'">
-      ゲーム
-      <button @click="exitRoom">退出</button>
-    </div>
-    <div v-else>
-      <div>
-        名前: <input v-model="userName" type="text" placeholder="名前を入力" />
-      </div>
-      <input type="radio" v-model="joinType" value="1" />新しく部屋を作る
-      <input type="radio" v-model="joinType" value="2" />友達の部屋に入る
 
-      <div v-if="joinType == 1">
-        <input type="button" value="部屋を作る" @click="createRoom" />
-      </div>
+    <div>
+      <p>部屋番号</p>
+      <h3>{{ store.state.roomId }}</h3>
+    </div>
 
-      <div v-if="joinType == 2">
-        部屋番号: <input v-model="roomId" type="text" />
-        <input type="button" value="入室" @click="enterRoom" />
+    <div v-if="store.state.users.length == 2">
+      <div class="card border-secondary" style="max-width: 15rem">
+        <div class="card-header">
+          {{ store.state.enemyUserObj.userPrivilege }}
+        </div>
+        <div class="card-body text-secondary">
+          <h5 class="card-title">
+            {{ store.state.enemyUserObj.userName }}
+          </h5>
+          <p class="card-text">
+            {{ store.state.enemyUserObj.userStatus }}
+          </p>
+        </div>
       </div>
     </div>
-    <div style="color: red">
-      {{ message }}
-    </div>
+    <div v-else><p>対戦相手がいません</p></div>
   </div>
+
+  <div class="list">
+    <div>
+      <div
+        class="name"
+        v-for="(value, key, index) in store.state.ms_stage"
+        :key="index"
+      >
+        <button class="btn btn-outline-secondary" @click="selectStage(key)">
+          <p>{{ value.name }}</p>
+        </button>
+      </div>
+    </div>
+    <BlockTable class="stagePreview" :contents="utils.splitArray(store.state.stageObj.map, store.state.stageSideLength)" />
+  </div>
+
+  <button @click="chageStatus">{{ store.state.myUserObj.userStatus }}</button>
+  <button @click="store.commit('eraseBufRoom')">退出</button>
 </template>
 
-<script>
+<script setup>
+import store from "@/store";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
+import BlockTable from "@/components/parts/BlockTable.vue";
+import utils from "@/utils";
 
-export default {
-  data: () => ({
-    userName: "",
-    userStatus: "",
-    userPrivilege: "",
+const loadRoomData = () => {
+  let usersList = store.state.users;
+  store.state.roomDocRef.onSnapshot((doc) => {
+    usersList.length = 0;
+    // let source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+    // console.log(source, " data: ", doc.data());
 
-    joinType: 1,
-    roomId: "00000",
-    roomStatus: "",
-    message: "",
+    let users = doc.get("users");
+    if (users == null) {store.commit('eraseBufRoom');return;}
+    store.state.stageObj = doc.get("stage");
+    users.forEach((user) => usersList.push(user));
+    store.state.myUserObj = users[1-store.state.enemyIndex];
+    if (usersList.length == 2) {
+      store.state.enemyUserObj = users[store.state.enemyIndex];
+      startGame("準備OK");
+    }
+  });
+}
 
-    enemyIndex: 1,
-  }),
-  methods: {
-    generateRoomId() {
-      const id = Math.floor(Math.random() * 89999 + 10000);
-      return id;
-    },
-    createRoom() {
-      this.message = "";
-      if (this.userName == "") {
-        this.message = "名前を入力してください";
-        return;
-      }
-      this.roomId = this.generateRoomId();
-      this.userStatus = "準備中";
-      this.userPrivilege = "owner";
-      const data = {
-        users: [
-          {
-            userId: this.$store.state.userId,
-            userName: this.userName,
-            userStatus: this.userStatus,
-            userPrivilege: this.userPrivilege,
-          },
-        ],
-      };
-      this.$store.commit("createServer", { roomId: this.roomId });
-      this.$store.state.roomDocRef.set(data);
-      this.loadRoomData();
-      this.roomStatus = "準備中";
-    },
-    enterRoom() {
-      this.message = "";
-      if (this.userName == "") {
-        this.message = "名前を入力してください";
-        return;
-      }
-      if (this.roomId == "") {
-        this.message = "部屋番号を入力してください";
-        return;
-      }
-      this.$store.commit("createServer", { roomId: this.roomId });
-      this.enemyIndex = 0;
-      this.$store.state.roomDocRef.get().then((doc) => {
-        if (doc.exists) {
-          let users = doc.get("users");
-          if (2 > users.length) {
-            this.userStatus = "準備中";
-            this.userPrivilege = "guest";
-            users.push({
-              userId: this.$store.state.userId,
-              userName: this.userName,
-              userStatus: this.userStatus,
-              userPrivilege: this.userPrivilege,
-            });
-            this.$store.state.roomDocRef.update({ users });
-            this.loadRoomData();
-            this.roomStatus = "準備中";
-          } else {
-            this.message = "その部屋は満室です";
-          }
-        } else {
-          this.message = "その部屋は存在しません";
-        }
-      });
-    },
-    loadRoomData() {
-      localStorage.setItem("buf_room_id", JSON.stringify(this.roomId));
+loadRoomData();
 
-      let usersList = this.$store.state.users;
-      this.$store.state.roomDocRef.onSnapshot((doc) => {
-        usersList.length = 0;
-        // let source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-        // console.log(source, " data: ", doc.data());
+const startGame = (status) => {
+  if (store.state.users.every((userData) => userData.userStatus == status)) {
+    store.state.gameMainPhase = 2;
+  }
+}
+const chageStatus = () => {
+  if (store.state.myUserObj.userStatus == "準備中") {
+    writeStatus("準備OK");
+  } else if (store.state.myUserObj.userStatus == "準備OK") {
+    writeStatus("準備中");
+  }
+}
+const writeStatus = (status) => {
+  store.state.roomDocRef.get().then((doc) => {
+    let users = doc.get("users");
+    users.forEach((userData) => {
+      if (userData.userId == store.state.userId) userData.userStatus = status;
+    });
+    store.state.roomDocRef.update({ users });
+  });
+}
 
-        let users = doc.get("users");
-        if (users != null) {
-          users.forEach((user) => usersList.push(user));
-        }
-        if (usersList.length == 0) {
-          this.exitRoom();
-        } else if (usersList.length == 2) {
-          this.$store.state.enemyId = users[this.enemyIndex].userId;
-          console.log(this.$store.state.enemyId);
-          this.setRoomStatus("準備OK");
-        }
-      });
-    },
-    exitRoom() {
-      this.$store.state.roomDocRef.delete();
-      this.roomStatus = "";
-      localStorage.removeItem("buf_room_id");
-      console.log("exit");
-    },
-    setRoomStatus(status) {
-      if (
-        this.$store.state.users.every(
-          (userData) => userData.userStatus == status
-        )
-      ) {
-        this.roomStatus = status;
-      }
-    },
-    writeStatus(status) {
-      this.userStatus = status;
-      this.$store.state.roomDocRef.get().then((doc) => {
-        let users = doc.get("users");
-        users.forEach((userData) => {
-          if (userData.userId == this.$store.state.userId) {
-            userData.userStatus = status;
-          }
-        });
-        this.$store.state.roomDocRef.update({ users });
-      });
-    },
-  },
-};
+const selectStage = (index) => {
+  store.state.currentStage = index;
+  store.state.stageObj = store.state.ms_stage[store.state.currentStage];
+  store.state.roomDocRef.update({stage: store.state.stageObj});
+}
 </script>
 
 <style lang="scss">
 .users {
   display: flex;
   justify-content: center;
+}
+.list {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  button {
+    height: 30px;
+    width: 200px;
+    margin-right: -29rem;
+  }
+  .name {
+    display: block;
+  }
+}
+.stagePreview {
+  border: solid 5px #260064;
+  transform: scale(0.3);
+  margin-top: -350px;
+  margin-right: -16rem;
 }
 </style>

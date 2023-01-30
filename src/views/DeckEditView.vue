@@ -21,6 +21,7 @@
 <script>
 import CardList from "@/components/CardList.vue";
 import DeckInfo from "@/components/DeckInfo.vue";
+import utils from "@/utils";
 
 export default {
   components: {
@@ -49,12 +50,12 @@ export default {
       if(id != 0 && this.myDeck.indexOf(card) != -1) return;
       this.myDeck[this.selectIndex] = card;
       this.editType = 1;
-      this.totalCount = this.$store.getters.getTotalCount(this.myDeck);
+      this.totalCount = utils.getTotalCount(this.myDeck);
     },
     loadDeck: function () {
       let deck = this.$store.state.tb_deckList[this.$store.state.currentDeck].deck;
       this.myDeck = this.$store.getters.findCardsById(deck);
-      this.totalCount = this.$store.getters.getTotalCount(this.myDeck);
+      this.totalCount = utils.getTotalCount(this.myDeck);
     },
     saveDeck: function(){
       this.clickEvent();

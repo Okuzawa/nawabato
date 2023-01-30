@@ -23,6 +23,7 @@
 
 <script>
 import BlockTable from "@/components/parts/BlockTable.vue";
+import utils from "@/utils";
 
 export default {
   name: "CardItem",
@@ -52,7 +53,7 @@ export default {
   computed: {
     cardMap: {
       get: function () {
-        return this.$store.getters.splitArray(this.map,8);
+        return utils.splitArray(this.map,8);
       },
     },
   },

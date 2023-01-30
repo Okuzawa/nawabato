@@ -16,6 +16,9 @@ const db = firebase.firestore();
 
 export default createStore({
   state: {
+    stageSideLength:30,
+    gameMainPhase:0,
+
     isLoading: true,
     userId: 0,
     currentDeck: 0,
@@ -24,11 +27,15 @@ export default createStore({
     ms_card: [],
     ms_stage: [],
 
+    currentStage: 1,
+    stageObj: Object,
+
     roomsDocRef: null,
-    roomData:[],
-    enemyId:0,
+    roomId:0,
+    enemyIndex:0,
     users: [],
-    gameDataList:[],
+    myUserObj:Object,
+    enemyUserObj:Object,
   },
   getters: {
     getBlockSrc: (state) => (index) => {
@@ -38,29 +45,8 @@ export default createStore({
       return state.ms_card.find(card => card.id == id)
     },
     findCardsById: (state, getters) => (cardIdList) => {
-      let cards = [];
-      cardIdList.forEach(id => cards.push(getters.findCardById(id)))
-      return cards
+      return cardIdList.map(id => getters.findCardById(id) )
     },
-    getTotalCount: () => (cardList) => {
-      let totalCount = 0
-      cardList.forEach(card => totalCount += card.count)
-      return totalCount
-    },
-    create2DArray: () => (rows, cols) => {
-      let array = new Array(rows);
-      for (let i = 0; i < rows; i++) {
-        array[i] = new Array(cols).fill(null);
-      }
-      return array;
-    },
-    splitArray: () => (array, part) => {
-      var tmp = [];
-      for (var i = 0; i < array.length; i += part) {
-        tmp.push(array.slice(i, i + part));
-      }
-      return tmp;
-    }
   },
   mutations: {
     addBlockSrc(state, { src }) {
@@ -102,18 +88,17 @@ export default createStore({
     createServer(state,{roomId}) {
       state.roomDocRef = db.collection("rooms").doc(String(roomId));
     },
-    eraseBufRoom() {
+    eraseBufRoom(state) {
       let bufRoomId = JSON.parse(localStorage.getItem("buf_room_id"));
       if (bufRoomId == null) {
         console.log("途中退出した部屋はありません")
       }
       else {
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
         db.collection("rooms").doc(String(bufRoomId)).delete();
         console.log("途中退出した部屋があったため、退出処理をしました")
         localStorage.removeItem("buf_room_id");
       }
+      state.gameMainPhase = 0;
     },
   },
   actions: {
@@ -126,14 +111,9 @@ export default createStore({
           return fetch_data.json();
         })
         .then(function (json) {
-          for (let i in json) {
-            context.commit("addCardList", { data: json[i] })
-          }
+          for (let i in json) {context.commit("addCardList", { data: json[i] })}
         })
-        .then(function () {
-          context.state.isLoading = false;
-          console.log("done")
-        });
+        .then(()=>context.state.isLoading = false);
     },
     addStageListAsync: function (context) {
       const api_url =
@@ -144,10 +124,9 @@ export default createStore({
           return fetch_data.json();
         })
         .then(function (json) {
-          for (let i in json) {
-            context.commit("addStageList", { data: json[i] })
-          }
+          for (let i in json) {context.commit("addStageList", { data: json[i] })}
         })
+        .then(()=>context.state.stageObj = context.state.ms_stage[0]);
     },
   }
 })

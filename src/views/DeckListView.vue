@@ -4,13 +4,10 @@
       {{this.$store.state.tb_deckList[this.$store.state.currentDeck].name}}
       マス合計：{{ totalCount }}
     </h4>
-    <div class="list">
+    <div class="deList">
       <div>
-        <div
-          class="name"
-          v-for="(value, key, index) in this.$store.state.tb_deckList"
-          :key="index"
-        >
+        <div class="deName" v-for="(value, key, index) in this.$store.state.tb_deckList"
+          :key="index">
           <button class="btn btn-outline-secondary" @click="selectDeck(key)">
             <p>{{ value.name }}</p>
           </button>
@@ -23,6 +20,7 @@
 
 <script>
 import Deck from "@/components/parts/Deck.vue";
+import utils from "@/utils";
 
 export default {
   name: "CardListView",
@@ -39,7 +37,7 @@ export default {
     loadDeck: function () {
       let deck = this.$store.state.tb_deckList[this.$store.state.currentDeck].deck;
       this.myDeck = this.$store.getters.findCardsById(deck);
-      this.totalCount = this.$store.getters.getTotalCount(this.myDeck);
+      this.totalCount = utils.getTotalCount(this.myDeck);
     },
     selectDeck: function (index) {
       this.$store.state.currentDeck = index;
@@ -54,10 +52,10 @@ export default {
 
 <style lang="scss" scoped>
 .deckList {
-  .list {
+  .deList {
     display: flex;
     justify-content: center;
-    .name {
+    .deName {
       background-color: #daf9fc;
       display: block;
     }

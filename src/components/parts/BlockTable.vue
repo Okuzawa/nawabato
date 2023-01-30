@@ -1,9 +1,9 @@
 <template>
 <table class="board-table">
   <tbody>
-    <tr v-for="(row, key, index) in board" :key="index">
-      <td v-for="(cell, key, index) in row" v-bind:class="'block-type-' + cell" :key="index">
-        <img :src = "this.$store.getters.getBlockSrc(cell)" width="30" height="30">
+    <tr v-for="(row, trkey, index) in board" :key="index">
+      <td v-for="(cell, tbkey, index) in row" v-bind:class="'block-type-' + cell" :key="index">
+        <img :src = "this.$store.getters.getBlockSrc(cell)" width="30" height="30" @click="pickTable(trkey* this.$store.state.stageSideLength +tbkey)">
       </td>
     </tr>
   </tbody>
@@ -11,28 +11,30 @@
 </template>
 
 <script>
-// function create2DArray(rows, cols) {
-//   let array = new Array(rows);
-//   for (let i = 0; i < rows; i++) {
-//     array[i] = new Array(cols).fill(null);
-//   }
-//   return array;
-// }
-
 export default {
   name: "BlockTable",
   props: {
     contents: Array,
+    selectCard:Array,
   },
   methods: {
     update(newTable) {
       this.board = newTable;
     },
+    pickTable(index){
+      console.log("pick",index)
+      this.$emit('pick', this.cardMap,index);
+    }
   },
   computed: {
     board: {
       get: function () {
         return this.contents;
+      }
+    },
+    cardMap:{
+      get: function () {
+        return this.selectCard;
       }
     },
   },
