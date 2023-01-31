@@ -103,8 +103,4 @@ const initRoom = () =>{
 </script>
 
 <style scoped lang="scss">
-.home{
-  position: relative;
-  z-index: 2;
-}
 </style>

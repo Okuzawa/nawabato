@@ -62,11 +62,15 @@ export default {
     this.enabled = this.isActiv.enabled;
     if (this.select.select != this.isSelect) this.isSelect = this.select.select;
   },
+  watch: {
+    isSelect: function(newVal, oldVal) {
+      console.log(newVal, oldVal)
+    }
+  },
   methods: {
     OnClick: function () {
       if (!this.enabled) return;
-      if (this.isSelect) this.isSelect = false;
-      else this.isSelect = true;
+      if (this.select.select != this.isSelect) this.isSelect = this.select.select;
     },
   },
 };

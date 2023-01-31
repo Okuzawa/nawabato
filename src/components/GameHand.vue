@@ -11,6 +11,8 @@
           :block="store.state.blocks[1]"
           :sp_block="store.state.blocks[2]"
           @click="pickCard(key)"
+          :select="{ select: key ==  handIndex? true:false }"
+          :isActiv="true"
         />
       </div>
     </transition-group>
@@ -18,7 +20,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, defineExpose } from "vue";
+import { defineProps, defineEmits, ref, defineExpose,computed } from "vue";
 import store from "@/store";
 import CardItem from "@/components/parts/CardItem.vue";
 
@@ -27,6 +29,8 @@ const props = defineProps({
 });
 
 let hand = ref([]);
+let pickIndex = ref(0)
+const handIndex = computed(() => pickIndex.value);
 
 const firestDrawCard = (count = 0, number = 4) => {
   hand.value.push(props.deck[count]);
@@ -37,6 +41,7 @@ const firestDrawCard = (count = 0, number = 4) => {
 
 const emit = defineEmits(["pick"]);
 const pickCard = (index) => {
+  pickIndex.value = index
   emit("pick", index);
 };
 defineExpose({

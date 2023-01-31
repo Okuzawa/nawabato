@@ -139,7 +139,7 @@ const rotateCard = ()=>{
     z-index: 0;
   }
   .virtualStage{
-    margin-top: -1086px;
+    margin-top: -1088px;
     z-index: 1;
     img{
       filter: opacity(50%);
@@ -159,7 +159,6 @@ const rotateCard = ()=>{
 }
 
 #overlay {
-  /* 要素を重ねた時の順番 */
   z-index: 5;
 
   /* 画面全体を覆う設定 */
