@@ -26,8 +26,8 @@ import src_sky from "@/assets/image/blocks/sky_block.png";
 import src_blue from "@/assets/image/blocks/blue_block.png";
 import src_blue_fire from "@/assets/image/blocks/blue_fire_block.png";
 import src_default from "@/assets/image/blocks/default_block.png";
-// import src_null from "@/assets/image/blocks/null_block.png";
-import src_null from "@/assets/image/blocks/frame_black.png";
+import src_null from "@/assets/image/blocks/null_block.png";
+// import src_null from "@/assets/image/blocks/frame_black.png";
 
 import LobbyView from "./views/LobbyView.vue";
 import HomeView from "./views/HomeView.vue";
