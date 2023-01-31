@@ -1,4 +1,5 @@
 <template>
+  <div class="home">
   <div>
     名前: <input v-model="userName" type="text" placeholder="名前を入力" />
   </div>
@@ -15,6 +16,7 @@
   </div>
   <div style="color: red">
     {{ message }}
+  </div>
   </div>
 </template>
 
@@ -101,4 +103,8 @@ const initRoom = () =>{
 </script>
 
 <style scoped lang="scss">
+.home{
+  position: relative;
+  z-index: 2;
+}
 </style>

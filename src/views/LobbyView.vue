@@ -40,7 +40,7 @@
   </div>
   <div>
   <p>{{ store.state.stageObj.name }}</p>
-  <BlockTable class="stagePreview" :contents=" utils.splitArray(store.state.stageObj.map, store.state.stageSideLength)"/>
+  <BlockTable class="stagePreview pointerNone" :contents=" utils.splitArray(store.state.stageObj.map, store.state.stageSideLength)"/>
   </div>
   <button @click="chageStatus">{{ store.state.myUserObj.userStatus }}</button>
   <button @click="store.commit('eraseBufRoom')">退出</button>
@@ -118,9 +118,12 @@ const selectStage = (index) => {
 .stagePreview {
   display: flex;
   justify-content: center;
-  transform: scale(0.3);
+  transform: scale(0.45);
   margin-top: -370px;
-  margin-bottom: -330px;
+  margin-bottom: -350px;
   padding: 0 10;
+}
+.pointerNone{
+  pointer-events: none;
 }
 </style>

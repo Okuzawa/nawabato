@@ -73,6 +73,9 @@ export default {
 </script>
 
 <style lang="scss">
+.CardItem{
+  background-color: #eeffeb;
+}
 .card-item {
   width: 90px;
   height: 150px;

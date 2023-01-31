@@ -37,7 +37,6 @@ const firestDrawCard = (count = 0, number = 4) => {
 
 const emit = defineEmits(["pick"]);
 const pickCard = (index) => {
-  console.log(index);
   emit("pick", index);
 };
 defineExpose({

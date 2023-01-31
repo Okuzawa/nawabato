@@ -16,7 +16,7 @@ const db = firebase.firestore();
 
 export default createStore({
   state: {
-    stageSideLength:30,
+    stageSideLength:34,
     gameMainPhase:0,
 
     isLoading: true,

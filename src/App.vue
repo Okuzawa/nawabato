@@ -1,7 +1,7 @@
 <template>
-<button @click="store.state.gameMainPhase = 2">debug</button>
   <div v-if="store.state.gameMainPhase == 0">
     <h2>ナワバトラー</h2>
+<button @click="store.state.gameMainPhase = 2">debug</button>
     <HomeView />
     <DeckManagerView />
   </div>

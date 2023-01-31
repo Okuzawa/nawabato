@@ -3,21 +3,22 @@
   <h2>残り{{13-gameTurn}}ターン</h2>
   <h4>yellow:00|blue:00</h4>
   </div>
+  
+  <div class="gamehand" v-if="gameTurn > -1">
+  <GameHand  ref="useHand" :deck="hand" @pick="PickUpCard"/>
+  <button @click="rotateCard">回転</button>
+  <button @click="merge">マージ</button>
+  <GameDeck :deck="myDeck"/>
+  </div>
+
   <div class="stage">
     <div>
       <BlockTable class="viewStage" :contents="utils.splitArray(stageMap, store.state.stageSideLength)" />
       <BlockTable class="virtualStage" :class="{ gray: !canPut }"
       :contents="utils.splitArray(virtualStage, store.state.stageSideLength)" 
-      :selectCard="utils.splitArray(selectCardMap, 8)"
+      :selectCard="utils.splitArray(selectCard.map, 8)"
       @pick="putCard"/>
     </div>
-  </div>
-
-  <div v-if="gameTurn > -1">
-  <GameHand ref="useHand" :deck="hand"/>
-  <button @click="rotateCard">回転</button>
-  <button @click="merge">マージ</button>
-  <GameDeck :deck="myDeck"/>
   </div>
 </template>
 
@@ -32,13 +33,13 @@ import GameHand from "@/components/GameHand.vue";
 const useHand = ref();
 
 let gameTurn = ref(1);
-let stageMap = ref(store.state.stageObj.map);
+let stageMap = ref(store.state.ms_stage[1].map);
 let virtualStage = ref(store.state.ms_stage[0].map);
-let selectCardMap = ref(store.state.ms_card[0].map);
+let selectCard = ref(store.state.ms_card[1]);
 let canPut = ref(true);
-let posIndex = ref(0);
-let myDeck = ref("");
-let hand = ref("");
+let posIndex = ref(798);
+let myDeck = ref([]);
+let hand = ref([]);
 
 let deck = store.state.tb_deckList[store.state.currentDeck].deck;
 myDeck.value = store.getters.findCardsById(deck);
@@ -51,7 +52,14 @@ const Mulligan = () =>{
   hand.value = tempHand
 }
 Mulligan();
-onMounted(() => { useHand.value.firestDrawCard() });
+onMounted(() => { useHand.value.firestDrawCard()
+PickUpCard(0)
+});
+
+const PickUpCard =(index)=>{
+  selectCard.value = hand.value[index]
+  putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
+}
 
 const merge = () => {
   if(!canPut.value)return
@@ -69,7 +77,6 @@ const merge = () => {
 const putCard = (cardMap, _index, offsetX = 0, offsetY = 0) => {
   let temp = utils.splitArray(store.state.ms_stage[0].map, store.state.stageSideLength)
   let card = cardMap
-  
   posIndex.value = _index
   let index = _index+offsetX+(offsetY*store.state.stageSideLength)
   for (let y = 0; y < 8; y++) {
@@ -110,7 +117,7 @@ const aroundCheck = (stage,yPos,xPos)=>{
 }
 
 const rotateCard = ()=>{
-  let cardMap = utils.splitArray(selectCardMap.value,8)
+  let cardMap = utils.splitArray(selectCard.value.map,8)
   let rotatedMap = []
   for (let y = 0; y < 8; y++) {
     rotatedMap[y] = [];
@@ -118,15 +125,13 @@ const rotateCard = ()=>{
       rotatedMap[y][x] = cardMap[x][8-y-1]
     }
   }
-  selectCardMap.value = rotatedMap.flat()
-  putCard(utils.splitArray(selectCardMap.value,8),posIndex.value)
+  selectCard.value.map = rotatedMap.flat()
+  putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
 }
 </script>
 
 <style lang="scss">
 .stage {
-  margin-top: -180px;
-  margin-bottom: -150px;
   transform: scale(0.7);
   display: flex;
   justify-content: center;
@@ -134,8 +139,7 @@ const rotateCard = ()=>{
     z-index: 0;
   }
   .virtualStage{
-    margin-top: -960px;
-    // margin-top: 100px;
+    margin-top: -1086px;
     z-index: 1;
     img{
       filter: opacity(50%);
@@ -147,10 +151,16 @@ const rotateCard = ()=>{
     }
   }
 }
+.gamehand{
+  margin-top: 600px;
+  margin-bottom: -1030px;
+  position: relative;
+  z-index: 2;
+}
 
 #overlay {
   /* 要素を重ねた時の順番 */
-  z-index: 2;
+  z-index: 5;
 
   /* 画面全体を覆う設定 */
   position: fixed;
@@ -167,6 +177,12 @@ const rotateCard = ()=>{
   .transitionBtn {
     height: 35px;
   }
+}
+#content {
+  z-index: 2;
+  width: 100%;
+  padding: 1em;
+  background: #fff;
 }
 #top-list {
   margin: 0px -100px;
