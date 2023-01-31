@@ -11,7 +11,6 @@
     <DeckSelectView/>
   </div>
   <div v-else-if="store.state.gameMainPhase == 2">
-    <h2>ゲーム画面</h2>
     <GameView />
   </div>
 </template>

@@ -1,30 +1,55 @@
 <template>
-  <div class="container">
-    <div
-      v-for="(value, key, index) in props.deck"
-      v-bind:key="index"
-    >
-      <CardItem
-        :id="value.id"
-        :name="value.name"
-        :count="value.count"
-        :cost="value.cost"
-        :map="value.map"
-        :block="store.getters.getBlockSrc(1)"
-        :sp_block="store.getters.getBlockSrc(2)"
-        :isDisabled="{disabled:false}"
-      />
+
+  <button @click="openModal">デッキ確認</button>
+
+  <div id="overlay" v-show="showContent">
+    <div id="content">
+      <div class="modal-body">
+        <div id="top-list">
+          <div class="container">
+            <div v-for="(value, key, index) in props.deck" v-bind:key="index">
+              <CardItem
+                :id="value.id"
+                :name="value.name"
+                :count="value.count"
+                :cost="value.cost"
+                :map="value.map"
+                :block="store.getters.getBlockSrc(1)"
+                :sp_block="store.getters.getBlockSrc(2)"
+                :isDisabled="{ disabled: false }"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-light transitionBtn"
+          @click="closeModal"
+        >
+          <p>閉じる</p>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { ref,defineProps } from "vue";
 import store from "@/store";
 import CardItem from "@/components/parts/CardItem.vue";
 
+const showContent = ref(false);
+const openModal = () => {
+  showContent.value = true;
+};
+const closeModal = () => {
+  showContent.value = false;
+};
+
 const props = defineProps({
-    deck:Array
+  deck: Array,
 });
 </script>
 

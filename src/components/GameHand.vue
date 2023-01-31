@@ -1,40 +1,61 @@
 <template>
   <div class="container">
-    <div v-for="(value, key, index) in props.deck" :key="index">
-      <CardItem
-        :id="value.id"
-        :name="value.name"
-        :count="value.count"
-        :cost="value.cost"
-        :map="value.map"
-        :block="store.state.blocks[1]"
-        :sp_block="store.state.blocks[2]"
-        @click="pickCard(key)"
-      />
-    </div>
+    <transition-group>
+      <div v-for="(value, key) in hand" :key="value.id">
+        <CardItem
+          :id="value.id"
+          :name="value.name"
+          :count="value.count"
+          :cost="value.cost"
+          :map="value.map"
+          :block="store.state.blocks[1]"
+          :sp_block="store.state.blocks[2]"
+          @click="pickCard(key)"
+        />
+      </div>
+    </transition-group>
   </div>
 </template>
 
 <script setup>
-import { defineProps,defineEmits } from 'vue';
+import { defineProps, defineEmits, ref, defineExpose } from "vue";
 import store from "@/store";
 import CardItem from "@/components/parts/CardItem.vue";
 
 const props = defineProps({
-    deck:Array
+  deck: Array,
 });
 
-const emit = defineEmits(['pick'])
-const pickCard = (index) =>{
-  emit('pick', index);
-}
+let hand = ref([]);
+
+const firestDrawCard = (count = 0, number = 4) => {
+  hand.value.push(props.deck[count]);
+  number--;
+  count++;
+  if (number > 0) setTimeout(() => firestDrawCard(count, number), 500);
+};
+
+const emit = defineEmits(["pick"]);
+const pickCard = (index) => {
+  console.log(index);
+  emit("pick", index);
+};
+defineExpose({
+  firestDrawCard,
+});
 </script>
 
 <style scoped>
+.v-enter-active, .v-leave-active {
+  transition: opacity 1.0s ease;
+}
+
+.v-enter-from, .v-leave-to {
+  opacity: 0;
+}
+
 .container {
-  background-color: #eeffeb;
   width: 370px;
-  border: solid 5px #260064;
   display: flex;
   flex-wrap: wrap;
   overflow-y: scroll;

@@ -1,60 +1,44 @@
 <template>
+  <div v-if="gameTurn > 0">
   <h2>残り{{13-gameTurn}}ターン</h2>
+  <h4>yellow:00|blue:00</h4>
+  </div>
   <div class="stage">
     <div>
       <BlockTable class="viewStage" :contents="utils.splitArray(stageMap, store.state.stageSideLength)" />
       <BlockTable class="virtualStage" :class="{ gray: !canPut }"
       :contents="utils.splitArray(virtualStage, store.state.stageSideLength)" 
       :selectCard="utils.splitArray(selectCardMap, 8)"
-      @pick="put"/>
+      @pick="putCard"/>
     </div>
   </div>
 
-  <GameHand :deck="hand"/>
+  <div v-if="gameTurn > -1">
+  <GameHand ref="useHand" :deck="hand"/>
   <button @click="rotateCard">回転</button>
   <button @click="merge">マージ</button>
-  <button @click="openModal">デッキ確認</button>
-  
-  <div id="overlay" v-show="showContent">
-    <div id="content">
-      <div class="modal-body">
-        <div id="top-list">
-          <GameDeck :deck="myDeck"/>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light transitionBtn" @click="closeModal">
-          <p>閉じる</p>
-        </button>
-      </div>
-    </div>
+  <GameDeck :deck="myDeck"/>
   </div>
 </template>
 
 <script setup scoped>
-import { ref } from "vue";
+import { ref,onMounted } from "vue";
 import store from "@/store";
 import utils from "@/utils";
 import BlockTable from "@/components/parts/BlockTable.vue";
 import GameDeck from "@/components/GameDeck.vue";
 import GameHand from "@/components/GameHand.vue";
 
-let gameTurn = ref(0);
-let stageMap = ref(store.state.ms_stage[1].map);
+const useHand = ref();
+
+let gameTurn = ref(1);
+let stageMap = ref(store.state.stageObj.map);
 let virtualStage = ref(store.state.ms_stage[0].map);
-let selectCardMap = ref(store.state.ms_card[1].map);
+let selectCardMap = ref(store.state.ms_card[0].map);
 let canPut = ref(true);
 let posIndex = ref(0);
 let myDeck = ref("");
 let hand = ref("");
-
-const showContent = ref(false);
-const openModal = () => {
-  showContent.value = true;
-};
-const closeModal = () => {
-  showContent.value = false;
-};
 
 let deck = store.state.tb_deckList[store.state.currentDeck].deck;
 myDeck.value = store.getters.findCardsById(deck);
@@ -66,8 +50,8 @@ const Mulligan = () =>{
   }
   hand.value = tempHand
 }
-
-Mulligan()
+Mulligan();
+onMounted(() => { useHand.value.firestDrawCard() });
 
 const merge = () => {
   if(!canPut.value)return
@@ -82,12 +66,12 @@ const merge = () => {
   gameTurn.value++
 };
 
-const put = (cardMap, _index) => {
+const putCard = (cardMap, _index, offsetX = 0, offsetY = 0) => {
   let temp = utils.splitArray(store.state.ms_stage[0].map, store.state.stageSideLength)
   let card = cardMap
   
   posIndex.value = _index
-  let index = _index-3+(-store.state.stageSideLength*3)
+  let index = _index+offsetX+(offsetY*store.state.stageSideLength)
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
       if(card[y][x] != 0) temp[y+Math.floor(index / store.state.stageSideLength)][x+index%store.state.stageSideLength]=card[y][x]
@@ -135,7 +119,7 @@ const rotateCard = ()=>{
     }
   }
   selectCardMap.value = rotatedMap.flat()
-  put(utils.splitArray(selectCardMap.value,8),posIndex.value)
+  putCard(utils.splitArray(selectCardMap.value,8),posIndex.value)
 }
 </script>
 
