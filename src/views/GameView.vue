@@ -5,9 +5,10 @@
   </div>
   
   <div class="gamehand" v-if="gameTurn > -1">
-  <GameHand  ref="useHand" :deck="hand" @pick="PickUpCard"/>
+  <GameHand v-if="hand != null" ref="useHand" :deck="hand" @pick="PickUpCard"/>
   <button @click="rotateCard">回転</button>
   <button @click="merge">マージ</button>
+  <button @click="isSp = !isSp">スペシャル{{isSp?'OFF':'ON'}}</button>
   <GameDeck :deck="myDeck"/>
   </div>
 
@@ -31,18 +32,39 @@ import GameDeck from "@/components/GameDeck.vue";
 import GameHand from "@/components/GameHand.vue";
 
 const useHand = ref();
+const setMyBlock = () =>{
+  if(store.state.myUserObj == null) store.state.myUserObj = {userPrivilege:'yellow'}
+  return store.state.myUserObj.userPrivilege == 'yellow' ? {normal:1,sp:3}:{normal:2,sp:4}
+}
 
 let gameTurn = ref(1);
-let stageMap = ref(store.state.ms_stage[1].map);
+let stageMap = ref(store.state.stageObj.map);
 let virtualStage = ref(store.state.ms_stage[0].map);
 let selectCard = ref(store.state.ms_card[1]);
 let canPut = ref(true);
 let posIndex = ref(798);
 let myDeck = ref([]);
 let hand = ref([]);
+let isSp = ref(false)
+const myBlock = setMyBlock()
 
-let deck = store.state.tb_deckList[store.state.currentDeck].deck;
-myDeck.value = store.getters.findCardsById(deck);
+const loadMydeck = () => {
+  let deck = store.state.tb_deckList[store.state.currentDeck].deck;
+  myDeck.value = store.getters.findCardsById(deck);
+  // if (store.state.myUserObj.userPrivilege == 'blue') {
+  //   let temp =  myDeck.value.map(value => {
+  //     return value
+  //     // return map.map(value=>{
+  //     //   if(value == 1) return 2
+  //     //   else if(value == 3) return 4
+  //     //   else return value
+  //     // })
+  //   })
+  //   console.log(temp)
+  //   // myDeck.value = temp
+  // }
+}
+loadMydeck()
 
 const Mulligan = () =>{
   let tempHand = [];
@@ -52,8 +74,10 @@ const Mulligan = () =>{
   hand.value = tempHand
 }
 Mulligan();
-onMounted(() => { useHand.value.firestDrawCard()
-PickUpCard(0)
+
+onMounted(() => {
+  useHand.value.firestDrawCard();
+  // PickUpCard(0);
 });
 
 const PickUpCard =(index)=>{
@@ -62,15 +86,9 @@ const PickUpCard =(index)=>{
 }
 
 const merge = () => {
-  if(!canPut.value)return
-  let temp = []
-  virtualStage.value.forEach((value,index) => {
-    if(value == 8){
-      temp.push(stageMap.value[index])
-    }
-    else temp.push(virtualStage.value[index])
-  });
-  stageMap.value = temp
+  if(!canPut.value) return
+  stageMap.value = virtualStage.value.map((value, index) => {
+    return value == 8 ? stageMap.value[index]:virtualStage.value[index] });
   gameTurn.value++
 };
 
@@ -91,26 +109,31 @@ const putCard = (cardMap, _index, offsetX = 0, offsetY = 0) => {
 const checkPutCard = (cardMap, index) => {
   let temp = utils.splitArray(stageMap.value,store.state.stageSideLength)
   let card = cardMap
-  let resultAround = []
-
+  let aroundResult =[]
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
+
       if(card[y][x] != 0){
-        if(temp[y+Math.floor(index / store.state.stageSideLength)][x+index%store.state.stageSideLength] != 0) return false
-        resultAround.push( checkAround(temp,y+Math.floor(index / store.state.stageSideLength),x+index%store.state.stageSideLength) )
+        if(isSp.value){
+          if(temp[y+Math.floor(index / store.state.stageSideLength)][x+index%store.state.stageSideLength] > 2) return false
+          aroundResult.push(serchAround([myBlock.sp],y+Math.floor(index/store.state.stageSideLength),x+index%store.state.stageSideLength))
+        }
+        else{
+          if(temp[y+Math.floor(index / store.state.stageSideLength)][x+index%store.state.stageSideLength] > 0) return false
+          aroundResult.push(serchAround([myBlock.normal,myBlock.sp],y+Math.floor(index/store.state.stageSideLength),x+index%store.state.stageSideLength))
+        }
       } 
+
     }
   }
-
-  if(!resultAround.some(value => value)) return false
-  return true
+  return aroundResult.some(value => value)
 };
 
-const checkAround = (stage,yPos,xPos)=>{
+const serchAround = (values,posY,posX)=>{
+  let tempMap = utils.splitArray(stageMap.value,store.state.stageSideLength)
   for (let y = 0; y < 3; y++) {
     for (let x = 0; x < 3; x++) {
-      let check = stage[(yPos-1)+y][(xPos-1)+x]
-      if(check == 1 || check == 2) return true
+      if(values.some(value=>value == tempMap[(posY-1)+y][(posX-1)+x])) return true
     }
   }
   return false
@@ -118,7 +141,6 @@ const checkAround = (stage,yPos,xPos)=>{
 
 const rotateCard = ()=>{
   let rotatedMap = utils.rotateArray(utils.splitArray(selectCard.value.map,8),8)
-  console.log(rotatedMap)
   selectCard.value.map = rotatedMap.flat()
   putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
 }

@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, defineExpose,computed } from "vue";
+import { defineProps, defineEmits, ref, defineExpose } from "vue";
 import store from "@/store";
 import CardItem from "@/components/parts/CardItem.vue";
 
@@ -28,8 +28,6 @@ const props = defineProps({
 
 let hand = ref([]);
 let pickIndex = ref(0)
-const handIndex = computed(() => pickIndex.value);
-console.log(handIndex)
 
 const firestDrawCard = (count = 0, number = 4) => {
   hand.value.push(props.deck[count]);

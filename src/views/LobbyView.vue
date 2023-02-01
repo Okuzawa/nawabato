@@ -80,7 +80,6 @@ loadRoomData();
 const startGame = (status) => {
   if (store.state.users.every((userData) => userData.userStatus == status)) {
     store.state.gameMainPhase = 2;
-    selectStage(0)
   }
 };
 const chageStatus = () => {

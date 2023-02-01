@@ -57,11 +57,11 @@ export default {
       },
     },
   },
-  watch: {
-    isSelect: function(newVal, oldVal) {
-      console.log(newVal, oldVal)
-    }
-  },
+  // watch: {
+  //   isSelect: function(newVal, oldVal) {
+  //     console.log(newVal, oldVal)
+  //   }
+  // },
   mounted() {
     if (this.id == 0) return;
     this.enabled = this.isActiv.enabled;

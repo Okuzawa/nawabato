@@ -22,7 +22,7 @@ export default {
       this.board = newTable;
     },
     pickTable(index){
-      console.log(index)
+      // console.log(index)
       this.$emit('pick', this.cardMap,index,-3,-3);
     }
   },
