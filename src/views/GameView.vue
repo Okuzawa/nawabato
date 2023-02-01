@@ -96,8 +96,8 @@ const checkPutCard = (cardMap, index) => {
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
       if(card[y][x] != 0){
-        resultAround.push( aroundCheck(temp,y+Math.floor(index / store.state.stageSideLength),x+index%store.state.stageSideLength) )
         if(temp[y+Math.floor(index / store.state.stageSideLength)][x+index%store.state.stageSideLength] != 0) return false
+        resultAround.push( checkAround(temp,y+Math.floor(index / store.state.stageSideLength),x+index%store.state.stageSideLength) )
       } 
     }
   }
@@ -106,7 +106,7 @@ const checkPutCard = (cardMap, index) => {
   return true
 };
 
-const aroundCheck = (stage,yPos,xPos)=>{
+const checkAround = (stage,yPos,xPos)=>{
   for (let y = 0; y < 3; y++) {
     for (let x = 0; x < 3; x++) {
       let check = stage[(yPos-1)+y][(xPos-1)+x]
@@ -117,14 +117,8 @@ const aroundCheck = (stage,yPos,xPos)=>{
 }
 
 const rotateCard = ()=>{
-  let cardMap = utils.splitArray(selectCard.value.map,8)
-  let rotatedMap = []
-  for (let y = 0; y < 8; y++) {
-    rotatedMap[y] = [];
-    for (let x = 0; x < 8; x++) {
-      rotatedMap[y][x] = cardMap[x][8-y-1]
-    }
-  }
+  let rotatedMap = utils.rotateArray(utils.splitArray(selectCard.value.map,8),8)
+  console.log(rotatedMap)
   selectCard.value.map = rotatedMap.flat()
   putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
 }

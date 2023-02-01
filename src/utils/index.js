@@ -20,7 +20,7 @@ function splitArray(array, part) {
     return tmp;
 }
 
-function shuffle(array) {
+function shuffleArray(array) {
     const cloneArray = [...array];
     for (let i = cloneArray.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1)); // 0 から i のランダムなインデックス
@@ -29,9 +29,21 @@ function shuffle(array) {
     return cloneArray
 }
 
+function rotateArray(array, part) {
+    let rotatedMap = []
+    for (let y = 0; y < part; y++) {
+        rotatedMap[y] = [];
+        for (let x = 0; x < part; x++) {
+            rotatedMap[y][x] = array[x][part - y - 1]
+        }
+    }
+    return rotatedMap
+}
+
 export default {
     getTotalCount,
     create2DArray,
     splitArray,
-    shuffle,
+    shuffleArray,
+    rotateArray
 };

@@ -5,7 +5,7 @@
       <div class="card-body text-secondary">
         <h5 class="card-title">{{ store.state.myUserObj.userName }}</h5>
         <p class="card-text">{{ store.state.myUserObj.userStatus }}</p>
-        <div class="dropdown" v-if="store.state.myUserObj.userPrivilege == 'owner'">
+        <div class="dropdown" v-if="store.state.myUserObj.userPrivilege == 'yellow'">
           <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
             {{store.state.stageObj.name}}
           </button>
@@ -39,8 +39,8 @@
     <div v-else><p>対戦相手がいません</p></div>
   </div>
   <div>
-  <p>{{ store.state.stageObj.name }}</p>
-  <BlockTable class="stagePreview pointerNone" :contents=" utils.splitArray(store.state.stageObj.map, store.state.stageSideLength)"/>
+    <p>{{ store.state.stageObj.name }}</p>
+    <BlockTable class="stagePreview pointerNone" :contents=" utils.splitArray(store.state.stageObj.map, store.state.stageSideLength)"/>
   </div>
   <button @click="chageStatus">{{ store.state.myUserObj.userStatus }}</button>
   <button @click="store.commit('eraseBufRoom')">退出</button>
@@ -65,7 +65,7 @@ const loadRoomData = () => {
       store.commit("eraseBufRoom");
       return;
     }
-    store.state.stageObj = doc.get("stage");
+    store.commit("setStageObj", { obj: doc.get("stage") });
     users.forEach((user) => usersList.push(user));
     store.state.myUserObj = users[1 - store.state.enemyIndex];
     if (usersList.length == 2) {

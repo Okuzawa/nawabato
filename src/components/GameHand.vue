@@ -11,8 +11,6 @@
           :block="store.state.blocks[1]"
           :sp_block="store.state.blocks[2]"
           @click="pickCard(key)"
-          :select="{ select: key ==  handIndex? true:false }"
-          :isActiv="true"
         />
       </div>
     </transition-group>
@@ -31,6 +29,7 @@ const props = defineProps({
 let hand = ref([]);
 let pickIndex = ref(0)
 const handIndex = computed(() => pickIndex.value);
+console.log(handIndex)
 
 const firestDrawCard = (count = 0, number = 4) => {
   hand.value.push(props.deck[count]);

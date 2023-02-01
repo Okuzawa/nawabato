@@ -38,7 +38,7 @@ const createRoom = () => {
       if (userName.value == "") {message.value = "名前を入力してください";return;}
       roomId.value = generateRoomId();
       userStatus.value = "準備中";
-      userPrivilege.value = "owner";
+      userPrivilege.value = "yellow";
       const data = {
         users: [
           {
@@ -68,7 +68,7 @@ const enterRoom = () => {
           let users = doc.get("users");
           if (2 > users.length) {
             userStatus.value = "準備中";
-            userPrivilege.value = "guest";
+            userPrivilege.value = "blue";
             users.push({
               userId: store.state.userId,
               userName: userName.value,

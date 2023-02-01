@@ -38,10 +38,10 @@ import GameView from "./views/GameView.vue";
 function init() {
   store.commit("addBlockSrc", { src: src_frame });
   store.commit("addBlockSrc", { src: src_yellow });
-  store.commit("addBlockSrc", { src: src_orange });
-  store.commit("addBlockSrc", { src: src_orange_fire });
   store.commit("addBlockSrc", { src: src_sky });
+  store.commit("addBlockSrc", { src: src_orange });
   store.commit("addBlockSrc", { src: src_blue });
+  store.commit("addBlockSrc", { src: src_orange_fire });
   store.commit("addBlockSrc", { src: src_blue_fire });
   store.commit("addBlockSrc", { src: src_default });
   store.commit("addBlockSrc", { src: src_null });

@@ -14,7 +14,6 @@
         :sp_block="this.$store.getters.getBlockSrc(2)"
         @click="change(value.id)"
         :select="{ select: -1 != this.myDeck.indexOf(value) ? true:false }"
-        :isActiv="{ enabled: -1 != this.myDeck.indexOf(value) ? false:true }"
       />
     </div>
   </div>

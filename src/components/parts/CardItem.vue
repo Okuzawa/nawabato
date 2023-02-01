@@ -2,7 +2,7 @@
   <div class="CardItem">
     <button
       class="card-item btn btn-outline-secondary"
-      :class="{ active: isSelect,disabled:isDisabled }"
+      :class="{ active: isSelect,disabled: isDisabled }"
       @click="
         OnClick();
         $emit('clickEvent');
@@ -57,20 +57,22 @@ export default {
       },
     },
   },
-  mounted() {
-    if (this.id == 0) return;
-    this.enabled = this.isActiv.enabled;
-    if (this.select.select != this.isSelect) this.isSelect = this.select.select;
-  },
   watch: {
     isSelect: function(newVal, oldVal) {
       console.log(newVal, oldVal)
     }
   },
+  mounted() {
+    if (this.id == 0) return;
+    this.enabled = this.isActiv.enabled;
+    if (this.select.select != this.isSelect) this.isSelect = this.select.select;
+  },
   methods: {
     OnClick: function () {
       if (!this.enabled) return;
-      if (this.select.select != this.isSelect) this.isSelect = this.select.select;
+      console.log(this.enabled)
+      if (this.isSelect) this.isSelect = false;
+      else this.isSelect = true;
     },
   },
 };

@@ -2,6 +2,7 @@ import { createStore } from 'vuex'
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
+import utils from "@/utils";
 
 const firebaseConfig = {
   apiKey: "AIzaSyArEFrBMUMDHAYTjFJ2HhsHb__zIPYMfLc",
@@ -49,6 +50,15 @@ export default createStore({
     },
   },
   mutations: {
+    setStageObj(state,{obj}){
+      state.stageObj = obj
+      if(state.myUserObj.userPrivilege == "blue"){
+        let tempMap = utils.splitArray(obj.map,state.stageSideLength)
+        tempMap = utils.rotateArray(tempMap,state.stageSideLength)
+        tempMap = utils.rotateArray(tempMap,state.stageSideLength)
+        state.stageObj.map = tempMap.flat()
+      }
+    },
     addBlockSrc(state, { src }) {
       state.blocks.push(src);
     },
