@@ -40,10 +40,20 @@ function rotateArray(array, part) {
     return rotatedMap
 }
 
+function serchAround(values, posY, posX, targetArea) {
+    for (let y = 0; y < 3; y++) {
+        for (let x = 0; x < 3; x++) {
+            if (values.some(value => value == targetArea[(posY - 1) + y][(posX - 1) + x])) return true
+        }
+    }
+    return false
+}
+
 export default {
     getTotalCount,
     create2DArray,
     splitArray,
     shuffleArray,
-    rotateArray
+    rotateArray,
+    serchAround,
 };

@@ -22,9 +22,9 @@ import src_frame from "@/assets/image/blocks/frame.png";
 import src_yellow from "@/assets/image/blocks/yellow_block.png";
 import src_orange from "@/assets/image/blocks/orange_block.png";
 import src_orange_fire from "@/assets/image/blocks/orange_fire_block.png";
-import src_sky from "@/assets/image/blocks/sky_block.png";
 import src_blue from "@/assets/image/blocks/blue_block.png";
-import src_blue_fire from "@/assets/image/blocks/blue_fire_block.png";
+import src_sky from "@/assets/image/blocks/sky_block.png";
+import src_sky_fire from "@/assets/image/blocks/sky_fire_block.png";
 import src_default from "@/assets/image/blocks/default_block.png";
 import src_null from "@/assets/image/blocks/null_block.png";
 // import src_null from "@/assets/image/blocks/frame_black.png";
@@ -38,11 +38,11 @@ import GameView from "./views/GameView.vue";
 function init() {
   store.commit("addBlockSrc", { src: src_frame });
   store.commit("addBlockSrc", { src: src_yellow });
-  store.commit("addBlockSrc", { src: src_sky });
-  store.commit("addBlockSrc", { src: src_orange });
   store.commit("addBlockSrc", { src: src_blue });
+  store.commit("addBlockSrc", { src: src_orange });
+  store.commit("addBlockSrc", { src: src_sky });
   store.commit("addBlockSrc", { src: src_orange_fire });
-  store.commit("addBlockSrc", { src: src_blue_fire });
+  store.commit("addBlockSrc", { src: src_sky_fire });
   store.commit("addBlockSrc", { src: src_default });
   store.commit("addBlockSrc", { src: src_null });
 

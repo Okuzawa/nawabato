@@ -32,10 +32,6 @@ import GameDeck from "@/components/GameDeck.vue";
 import GameHand from "@/components/GameHand.vue";
 
 const useHand = ref();
-const setMyBlock = () =>{
-  if(store.state.myUserObj == null) store.state.myUserObj = {userPrivilege:'yellow'}
-  return store.state.myUserObj.userPrivilege == 'yellow' ? {normal:1,sp:3}:{normal:2,sp:4}
-}
 
 let gameTurn = ref(1);
 let stageMap = ref(store.state.stageObj.map);
@@ -48,98 +44,96 @@ let hand = ref([]);
 let isSp = ref(false)
 const myBlock = setMyBlock()
 
-const loadMydeck = () => {
-  let deck = store.state.tb_deckList[store.state.currentDeck].deck;
-  myDeck.value = store.getters.findCardsById(deck);
-  // if (store.state.myUserObj.userPrivilege == 'blue') {
-  //   let temp =  myDeck.value.map(value => {
-  //     return value
-  //     // return map.map(value=>{
-  //     //   if(value == 1) return 2
-  //     //   else if(value == 3) return 4
-  //     //   else return value
-  //     // })
-  //   })
-  //   console.log(temp)
-  //   // myDeck.value = temp
-  // }
+function init(){
+  loadMydeck()
+  Mulligan()
 }
-loadMydeck()
-
-const Mulligan = () =>{
-  let tempHand = [];
-  for (let i = 0; i < 4; i++) {
-    tempHand.push(myDeck.value[i])
-  }
-  hand.value = tempHand
-}
-Mulligan();
+init()
 
 onMounted(() => {
   useHand.value.firestDrawCard();
   // PickUpCard(0);
 });
 
-const PickUpCard =(index)=>{
+function loadMydeck(){
+  let deck = store.state.tb_deckList[store.state.currentDeck].deck;
+  myDeck.value = store.getters.findCardsById(deck);
+  if (store.state.myUserObj.userPrivilege == 'blue') {
+    let blueDeck = replaceToBlue(myDeck.value)
+    myDeck.value = blueDeck
+  }
+}
+
+function replaceToBlue(cardList) {
+  return cardList.map(card => { let blueMap = card.map.map(value => {
+    if (value != 0) return value + 1
+    return value;
+    })
+    return { ...card, map: blueMap }
+  });
+}
+
+function setMyBlock(){
+  return store.state.myUserObj.userPrivilege == 'blue' ? {normal:2,sp:4}:{normal:1,sp:3}
+}
+
+function Mulligan(){
+  let tempHand = [];
+  for (let i = 0; i < 4; i++) {
+    tempHand.push(myDeck.value[i])
+  }
+  hand.value = tempHand
+}
+
+function PickUpCard(index){
   selectCard.value = hand.value[index]
   putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
 }
 
-const merge = () => {
+function merge(){
   if(!canPut.value) return
   stageMap.value = virtualStage.value.map((value, index) => {
     return value == 8 ? stageMap.value[index]:virtualStage.value[index] });
   gameTurn.value++
-};
+}
 
-const putCard = (cardMap, _index, offsetX = 0, offsetY = 0) => {
+function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
   let temp = utils.splitArray(store.state.ms_stage[0].map, store.state.stageSideLength)
-  let card = cardMap
   posIndex.value = _index
   let index = _index+offsetX+(offsetY*store.state.stageSideLength)
+  const stageOffsetY = Math.floor(index / store.state.stageSideLength)
+  const stageOffsetX = index%store.state.stageSideLength
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
-      if(card[y][x] != 0) temp[y+Math.floor(index / store.state.stageSideLength)][x+index%store.state.stageSideLength]=card[y][x]
+      if(cardMap[y][x] != 0) temp[y+stageOffsetY][x+stageOffsetX]=cardMap[y][x]
     }
   }
   virtualStage.value = temp.flat()
-  canPut.value = checkPutCard(cardMap,index)
-};
+  const stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
+  canPut.value = checkPutCard(cardMap,stageOffsetY,stageOffsetX,stage)
+}
 
-const checkPutCard = (cardMap, index) => {
-  let temp = utils.splitArray(stageMap.value,store.state.stageSideLength)
-  let card = cardMap
+function checkPutCard (cardMap, stageOffsetY,stageOffsetX,stage){
   let aroundResult =[]
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
-
-      if(card[y][x] != 0){
+      if(cardMap[y][x] != 0){
         if(isSp.value){
-          if(temp[y+Math.floor(index / store.state.stageSideLength)][x+index%store.state.stageSideLength] > 2) return false
-          aroundResult.push(serchAround([myBlock.sp],y+Math.floor(index/store.state.stageSideLength),x+index%store.state.stageSideLength))
+          if(stage[y+stageOffsetY][x+stageOffsetX] > 2) return false
+          aroundResult.push(utils.serchAround([myBlock.sp],y+stageOffsetY,x+stageOffsetX,stage))
         }
         else{
-          if(temp[y+Math.floor(index / store.state.stageSideLength)][x+index%store.state.stageSideLength] > 0) return false
-          aroundResult.push(serchAround([myBlock.normal,myBlock.sp],y+Math.floor(index/store.state.stageSideLength),x+index%store.state.stageSideLength))
+          if(stage[y+stageOffsetY][x+stageOffsetX] > 0) return false
+          aroundResult.push(utils.serchAround([myBlock.normal,myBlock.sp],y+stageOffsetY,x+stageOffsetX,stage))
         }
       } 
 
     }
   }
   return aroundResult.some(value => value)
-};
-
-const serchAround = (values,posY,posX)=>{
-  let tempMap = utils.splitArray(stageMap.value,store.state.stageSideLength)
-  for (let y = 0; y < 3; y++) {
-    for (let x = 0; x < 3; x++) {
-      if(values.some(value=>value == tempMap[(posY-1)+y][(posX-1)+x])) return true
-    }
-  }
-  return false
 }
 
-const rotateCard = ()=>{
+function rotateCard(){
   let rotatedMap = utils.rotateArray(utils.splitArray(selectCard.value.map,8),8)
   selectCard.value.map = rotatedMap.flat()
   putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
