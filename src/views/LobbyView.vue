@@ -1,11 +1,11 @@
 <template>
   <div class="users">
     <div class="card border-secondary" style="max-width: 15rem">
-      <div class="card-header">{{ store.state.myUserObj.userPrivilege }}</div>
+      <div class="card-header">{{ store.state.myUserObj.userColor }}</div>
       <div class="card-body text-secondary">
         <h5 class="card-title">{{ store.state.myUserObj.userName }}</h5>
         <p class="card-text">{{ store.state.myUserObj.userStatus }}</p>
-        <div class="dropdown" v-if="store.state.myUserObj.userPrivilege == 'yellow'">
+        <div class="dropdown" v-if="store.state.myUserObj.userColor == 'yellow'">
           <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
             {{store.state.stageObj.name}}
           </button>
@@ -24,7 +24,7 @@
     <div v-if="store.state.users.length == 2">
       <div class="card border-secondary" style="max-width: 15rem">
         <div class="card-header">
-          {{ store.state.enemyUserObj.userPrivilege }}
+          {{ store.state.enemyUserObj.userColor }}
         </div>
         <div class="card-body text-secondary">
           <h5 class="card-title">

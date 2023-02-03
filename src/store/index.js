@@ -52,7 +52,7 @@ export default createStore({
   mutations: {
     setStageObj(state,{obj}){
       state.stageObj = obj
-      if(state.myUserObj.userPrivilege == "blue"){
+      if(state.myUserObj.userColor == "blue"){
         let tempMap = utils.splitArray(obj.map,state.stageSideLength)
         tempMap = utils.rotateArray(tempMap,state.stageSideLength)
         tempMap = utils.rotateArray(tempMap,state.stageSideLength)

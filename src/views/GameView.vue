@@ -47,7 +47,7 @@ import CardItem from "@/components/parts/CardItem.vue";
 const useHand = ref();
 
 let gameTurn = ref(1);
-let stageMap = ref(store.state.ms_stage[1].map);
+let stageMap = ref(store.state.stageObj.map);
 let virtualStage = ref(store.state.ms_stage[0].map);
 let selectCard = ref(store.state.ms_card[1]);
 let canPut = ref(true);
@@ -71,7 +71,7 @@ onMounted(() => {
 function loadMydeck(){
   let deck = store.state.tb_deckList[store.state.currentDeck].deck;
   myDeck.value = store.getters.findCardsById(deck);
-  if (store.state.myUserObj.userPrivilege == 'blue') {
+  if (store.state.myUserObj.userColor == 'blue') {
     let blueDeck = replaceToBlue(myDeck.value)
     myDeck.value = blueDeck
   }
@@ -87,7 +87,7 @@ function replaceToBlue(cardList) {
 }
 
 function setMyBlock(){
-  return store.state.myUserObj.userPrivilege == 'blue' ? {normal:2,sp:4}:{normal:1,sp:3}
+  return store.state.myUserObj.userColor == 'blue' ? {normal:2,sp:4}:{normal:1,sp:3}
 }
 
 function Mulligan(){
@@ -160,12 +160,12 @@ function rotateCard(){
     .playerData{
       z-index: 1;
       padding-top: 300px;
-      margin-left: -375px;
-      transform: scale(0.9);
+      margin-left: -390px;
+      transform: scale(0.8);
     }
     .stage {
       margin-top: -50px;
-      margin-left: -360px;
+      margin-left: -350px;
       transform: scale(0.55);
     .veiwStage{
       z-index: 0;

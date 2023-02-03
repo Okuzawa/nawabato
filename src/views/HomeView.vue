@@ -30,27 +30,19 @@ const joinType = ref(1);
 const message = ref("");
 const userName = ref("");
 const roomId = ref("");
-const userStatus = ref("");
-const userPrivilege = ref("");
 
 const createRoom = () => {
   message.value = "";
       if (userName.value == "") {message.value = "名前を入力してください";return;}
       roomId.value = generateRoomId();
-      userStatus.value = "準備中";
-      userPrivilege.value = "yellow";
-      const data = {
-        users: [
-          {
-            userId: store.state.userId,
-            userName: userName.value,
-            userStatus: userStatus.value,
-            userPrivilege: userPrivilege.value,
-          },
-        ],
-      };
+      store.state.myUserObj = {
+        userId: store.state.userId,
+        userName: userName.value,
+        userStatus: "準備中",
+        userColor:"yellow"
+      }
+      const data = {users: [store.state.myUserObj],};
       store.commit("createServer", { roomId: roomId.value });
-      setMyUserData(data.users[0])
       store.state.roomDocRef.set(data);
       store.state.stageObj = store.state.ms_stage[store.state.currentStage];
       store.state.roomDocRef.update({stage: store.state.stageObj});
@@ -67,15 +59,13 @@ const enterRoom = () => {
         if (doc.exists) {
           let users = doc.get("users");
           if (2 > users.length) {
-            userStatus.value = "準備中";
-            userPrivilege.value = "blue";
-            users.push({
+            store.state.myUserObj = {
               userId: store.state.userId,
               userName: userName.value,
-              userStatus: userStatus.value,
-              userPrivilege: userPrivilege.value,
-            });
-            setMyUserData(users[1])
+              userStatus: "準備中",
+              userColor: "blue",
+            }
+            users.push(store.state.myUserObj);
             store.state.roomDocRef.update({ users });
             initRoom();
           } 
@@ -83,11 +73,6 @@ const enterRoom = () => {
         } 
         else message.value = "その部屋は存在しません";
       });
-}
-
-const setMyUserData = (data) =>{
-  console.log(data)
-  store.state.myUserObj = data
 }
 
 const generateRoomId = () => {
