@@ -1,7 +1,6 @@
 <template>
   <div v-if="gameTurn > 0">
   <h2>残り{{13-gameTurn}}ターン</h2>
-  <h4>yellow:00|blue:00</h4>
   </div>
   
   <div class="gamehand" v-if="gameTurn > -1">
@@ -12,13 +11,26 @@
   <GameDeck :deck="myDeck"/>
   </div>
 
-  <div class="stage">
-    <div>
-      <BlockTable class="viewStage" :contents="utils.splitArray(stageMap, store.state.stageSideLength)" />
-      <BlockTable class="virtualStage" :class="{ gray: !canPut }"
-      :contents="utils.splitArray(virtualStage, store.state.stageSideLength)" 
-      :selectCard="utils.splitArray(selectCard.map, 8)"
-      @pick="putCard"/>
+  <div class="container">
+    <div class="stage">
+      <div>
+        <BlockTable class="viewStage" :contents="utils.splitArray(stageMap, store.state.stageSideLength)" />
+        <BlockTable class="virtualStage" :class="{ gray: !canPut }"
+        :contents="utils.splitArray(virtualStage, store.state.stageSideLength)" 
+        :selectCard="utils.splitArray(selectCard.map, 8)"
+        @pick="putCard"/>
+      </div>
+    </div>
+    <div class="playerData">
+      <CardItem :id="store.getters.findCardById(0).id" :name="store.getters.findCardById(0).name" 
+      :count="store.getters.findCardById(0).count" :cost="store.getters.findCardById(0).cost" :map="store.getters.findCardById(0).map"
+      :block="store.getters.getBlockSrc(1)"
+      :sp_block="store.getters.getBlockSrc(2)"/>
+
+      <CardItem :id="store.getters.findCardById(0).id" :name="store.getters.findCardById(0).name" 
+      :count="store.getters.findCardById(0).count" :cost="store.getters.findCardById(0).cost" :map="store.getters.findCardById(0).map"
+      :block="store.getters.getBlockSrc(1)"
+      :sp_block="store.getters.getBlockSrc(2)"/>
     </div>
   </div>
 </template>
@@ -30,11 +42,12 @@ import utils from "@/utils";
 import BlockTable from "@/components/parts/BlockTable.vue";
 import GameDeck from "@/components/GameDeck.vue";
 import GameHand from "@/components/GameHand.vue";
+import CardItem from "@/components/parts/CardItem.vue";
 
 const useHand = ref();
 
 let gameTurn = ref(1);
-let stageMap = ref(store.state.stageObj.map);
+let stageMap = ref(store.state.ms_stage[1].map);
 let virtualStage = ref(store.state.ms_stage[0].map);
 let selectCard = ref(store.state.ms_card[1]);
 let canPut = ref(true);
@@ -141,29 +154,35 @@ function rotateCard(){
 </script>
 
 <style lang="scss">
-.stage {
-  transform: scale(0.7);
+.container{
   display: flex;
   justify-content: center;
-  .veiwStage{
-    z-index: 0;
-  }
-  .virtualStage{
-    margin-top: -1088px;
-    z-index: 1;
-    img{
-      filter: opacity(50%);
+    .playerData{
+      z-index: 1;
+      padding-top: 300px;
+      margin-left: -375px;
+      transform: scale(0.9);
     }
-  }
-  .gray{
-    img{
-      filter: opacity(50%) grayscale(100%);
+    .stage {
+      margin-top: -50px;
+      margin-left: -360px;
+      transform: scale(0.55);
+    .veiwStage{
+      z-index: 0;
+    }
+    .virtualStage{
+      margin-top: -1088px;
+      z-index: 1;
+      img{ filter: opacity(50%);}
+    }
+    .gray{
+      img{ filter: opacity(50%) grayscale(100%);}
     }
   }
 }
 .gamehand{
-  margin-top: 600px;
-  margin-bottom: -1030px;
+  margin-top: 460px;
+  margin-bottom: -910px;
   position: relative;
   z-index: 2;
 }
