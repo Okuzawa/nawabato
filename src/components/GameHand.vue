@@ -11,6 +11,7 @@
           :block="store.state.blocks[1]"
           :sp_block="store.state.blocks[2]"
           @click="pickCard(key)"
+          :select="{ select: 0 <= canPlayCards.indexOf(value) ? true:false }"
         />
       </div>
     </transition-group>
@@ -18,23 +19,34 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, defineExpose } from "vue";
+import { defineProps, defineEmits, ref, defineExpose, computed } from "vue";
 import store from "@/store";
 import CardItem from "@/components/parts/CardItem.vue";
 
 const props = defineProps({
   deck: Array,
+  canPlay:Array,
 });
+const canPlayCards = computed(()=>{
+  return props.canPlay
+})
+const hand = computed(()=>{
+  return tempHand.value
+})
 
-let hand = ref([]);
+let tempHand = ref([]);
 let pickIndex = ref(0)
 
 const firestDrawCard = (count = 0, number = 4) => {
-  hand.value.push(props.deck[count]);
+  tempHand.value.push(props.deck[count]);
   number--;
   count++;
   if (number > 0) setTimeout(() => firestDrawCard(count, number), 500);
 };
+
+const updata = (hand)=>{
+  tempHand.value = hand
+}
 
 const emit = defineEmits(["pick"]);
 const pickCard = (index) => {
@@ -43,6 +55,7 @@ const pickCard = (index) => {
 };
 defineExpose({
   firestDrawCard,
+  updata,
 });
 </script>
 

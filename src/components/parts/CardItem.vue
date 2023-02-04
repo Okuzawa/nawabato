@@ -1,13 +1,7 @@
 <template>
   <div class="CardItem">
-    <button
-      class="card-item btn btn-outline-secondary"
-      :class="{ active: isSelect,disabled: isDisabled }"
-      @click="
-        OnClick();
-        $emit('clickEvent');
-      "
-    >
+    <button v-if="id != 0" class="card-item btn btn-outline-secondary"
+      :class="{ active: isSelect,disabled: isDisabled }" @click="OnClick();$emit('clickEvent');">
       <BlockTable BlockTable :contents="cardMap" class="cardMap"/>
       <p class="name">{{ name }}</p>
       <div class="count">
@@ -18,6 +12,9 @@
         <p class="cost">{{ cost }}</p>
       </div>
     </button>
+    <div v-else class="card-item">
+      <h1>⊕</h1>
+    </div>
   </div>
 </template>
 
@@ -69,6 +66,7 @@ export default {
   },
   methods: {
     OnClick: function () {
+      console.log(this.name)
       if (!this.enabled) return;
       console.log(this.enabled)
       if (this.isSelect) this.isSelect = false;
@@ -85,6 +83,16 @@ export default {
 .card-item {
   width: 90px;
   height: 150px;
+  h1{
+    width: 90px;
+    height: 150px;
+    background-color:#686868;
+    border: solid 3px #adadad;
+    color: #adadad;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   .cardMap {
     transform: scale(0.3);
     margin: -85px -95px;

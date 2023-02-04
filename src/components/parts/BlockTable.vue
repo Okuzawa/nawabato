@@ -2,7 +2,7 @@
 <table class="board-table">
   <tbody>
     <tr v-for="(row, trkey, index) in board" :key="index">
-      <td v-for="(cell, tbkey, index) in row" v-bind:class="'block-type-' + cell" :key="index">
+      <td v-for="(cell, tbkey, index) in row" :class="'block-type-' + cell" :key="index">
         <img :src = "this.$store.getters.getBlockSrc(cell)" width="30" height="30" @click="pickTable(trkey* this.$store.state.stageSideLength +tbkey)">
       </td>
     </tr>

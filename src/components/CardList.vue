@@ -1,9 +1,7 @@
 <template>
   <div class="container">
     <div
-      v-for="(value, key, index) in this.$store.state.ms_card"
-      v-bind:key="index"
-    >
+      v-for="(value, key, index) in this.$store.state.ms_card" :key="index">
       <CardItem
         :id="value.id"
         :name="value.name"

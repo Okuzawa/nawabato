@@ -4,13 +4,12 @@
   </div>
   
   <div class="controller" v-if="gameTurn > -1">
-    <GameHand class="hand" ref="useHand" :deck="hand" @pick="PickUpCard"/>
+    <GameHand class="hand" ref="useHand" :deck="hand" :canPlay ="canPlay" @pick="PickUpCard"/>
+    <button>パス</button>
     <button @click="rotateCard">回転</button>
-    <button @click="merge">マージ</button>
-    <button @click="isSp = !isSp">スペシャル{{isSp?'OFF':'ON'}}</button>
+    <button @click="isSp = !isSp">SP発動{{isSp?'OFF':'ON'}}</button>
     <GameDeck :deck="myDeck"/>
   </div>
-
   <div class="container">
     <div class="stage">
       <div>
@@ -27,10 +26,12 @@
       :block="store.getters.getBlockSrc(1)"
       :sp_block="store.getters.getBlockSrc(2)"/>
       <div class = "data" :class="(store.state.enemyUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">
+        <p>name : sp00</p>
         <h1>00</h1>  
       </div>
       <div class = "data" :class="(store.state.myUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">
         <h1>00</h1>
+        <p>name : sp00</p>
       </div>
       <CardItem :id="store.getters.findCardById(0).id" :name="store.getters.findCardById(0).name" 
       :count="store.getters.findCardById(0).count" :cost="store.getters.findCardById(0).cost" :map="store.getters.findCardById(0).map"
@@ -38,6 +39,9 @@
       :sp_block="store.getters.getBlockSrc(2)"/>
     </div>
   </div>
+  <button @click="merge">マージ</button>
+  <button @click="canPlay.length = 0;">reset</button>
+  <button @click="addHand">add</button>
 </template>
 
 <script setup scoped>
@@ -53,19 +57,27 @@ const useHand = ref();
 
 let gameTurn = ref(1);
 let stageMap = ref(store.state.stageObj.map);
-// let stageMap = ref(store.state.ms_stage[1].map);
+// let stageMap = ref(store.state.ms_stage[3].map);
 let virtualStage = ref(store.state.ms_stage[0].map);
 let selectCard = ref(store.state.ms_card[0]);
 let canPut = ref(true);
 let posIndex = ref(798);
 let myDeck = ref([]);
 let hand = ref([]);
-let isSp = ref(false)
+let canPlay = ref([]);
+let isSp = ref(false);
 const myBlock = setMyBlock()
+
+function addHand(){
+  hand.value[3] = store.getters.findCardById(90)
+  useHand.value.updata(hand.value)
+}
 
 function init(){
   loadMydeck()
   Mulligan()
+  canPlay.value.push(store.getters.findCardById(34))
+  canPlay.value.push(store.getters.findCardById(159))
 }
 init()
 
@@ -166,9 +178,12 @@ function rotateCard(){
     .playerData{
       z-index: 1;
       pointer-events: none;
-      padding-top: 300px;
-      margin-left: -410px;
-      transform: scale(0.9);
+      padding-top: 260px;
+      margin-left: -400px;
+      transform: scale(0.8);
+      .data{
+        margin-bottom: -15px;
+      }
       .yellow{
         color: orange
       }
@@ -180,7 +195,6 @@ function rotateCard(){
       margin-top: -50px;
       margin-left: -400px;
       transform: scale(0.45);
-      border: solid 5px #260064;
     .veiwStage{
       z-index: 0;
     }
@@ -200,6 +214,7 @@ function rotateCard(){
   position: relative;
   z-index: 2;
   .hand{
+    width: 480px;
     transform: scale(0.75);
   }
 }
@@ -207,7 +222,6 @@ function rotateCard(){
 #overlay {
   z-index: 5;
 
-  /* 画面全体を覆う設定 */
   position: fixed;
   top: 0;
   left: 0;
@@ -215,7 +229,6 @@ function rotateCard(){
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
 
-  /* 画面の中央に要素を表示させる設定 */
   display: flex;
   align-items: center;
   justify-content: center;
