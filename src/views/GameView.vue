@@ -3,12 +3,12 @@
   <h2>残り{{13-gameTurn}}ターン</h2>
   </div>
   
-  <div class="gamehand" v-if="gameTurn > -1">
-  <GameHand v-if="hand != null" ref="useHand" :deck="hand" @pick="PickUpCard"/>
-  <button @click="rotateCard">回転</button>
-  <button @click="merge">マージ</button>
-  <button @click="isSp = !isSp">スペシャル{{isSp?'OFF':'ON'}}</button>
-  <GameDeck :deck="myDeck"/>
+  <div class="controller" v-if="gameTurn > -1">
+    <GameHand class="hand" ref="useHand" :deck="hand" @pick="PickUpCard"/>
+    <button @click="rotateCard">回転</button>
+    <button @click="merge">マージ</button>
+    <button @click="isSp = !isSp">スペシャル{{isSp?'OFF':'ON'}}</button>
+    <GameDeck :deck="myDeck"/>
   </div>
 
   <div class="container">
@@ -26,7 +26,12 @@
       :count="store.getters.findCardById(0).count" :cost="store.getters.findCardById(0).cost" :map="store.getters.findCardById(0).map"
       :block="store.getters.getBlockSrc(1)"
       :sp_block="store.getters.getBlockSrc(2)"/>
-
+      <div class = "data" :class="(store.state.enemyUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">
+        <h1>00</h1>  
+      </div>
+      <div class = "data" :class="(store.state.myUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">
+        <h1>00</h1>
+      </div>
       <CardItem :id="store.getters.findCardById(0).id" :name="store.getters.findCardById(0).name" 
       :count="store.getters.findCardById(0).count" :cost="store.getters.findCardById(0).cost" :map="store.getters.findCardById(0).map"
       :block="store.getters.getBlockSrc(1)"
@@ -48,8 +53,9 @@ const useHand = ref();
 
 let gameTurn = ref(1);
 let stageMap = ref(store.state.stageObj.map);
+// let stageMap = ref(store.state.ms_stage[1].map);
 let virtualStage = ref(store.state.ms_stage[0].map);
-let selectCard = ref(store.state.ms_card[1]);
+let selectCard = ref(store.state.ms_card[0]);
 let canPut = ref(true);
 let posIndex = ref(798);
 let myDeck = ref([]);
@@ -159,14 +165,22 @@ function rotateCard(){
   justify-content: center;
     .playerData{
       z-index: 1;
+      pointer-events: none;
       padding-top: 300px;
-      margin-left: -390px;
-      transform: scale(0.8);
+      margin-left: -410px;
+      transform: scale(0.9);
+      .yellow{
+        color: orange
+      }
+      .blue{
+        color: blue
+      }
     }
     .stage {
       margin-top: -50px;
-      margin-left: -350px;
-      transform: scale(0.55);
+      margin-left: -400px;
+      transform: scale(0.45);
+      border: solid 5px #260064;
     .veiwStage{
       z-index: 0;
     }
@@ -180,11 +194,14 @@ function rotateCard(){
     }
   }
 }
-.gamehand{
-  margin-top: 460px;
-  margin-bottom: -910px;
+.controller{
+  margin-top: 400px;
+  margin-bottom: -880px;
   position: relative;
   z-index: 2;
+  .hand{
+    transform: scale(0.75);
+  }
 }
 
 #overlay {
