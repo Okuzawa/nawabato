@@ -1,7 +1,7 @@
 <template>
   <div class="CardItem">
     <button v-if="id != 0" class="card-item btn btn-outline-secondary"
-      :class="{ active: this.select.select,disabled: isDisabled }" @click="OnClick();$emit('clickEvent');">
+      :class="{ active: select.select, disabled: isDisabled, gaming: isSp }" @click="OnClick();$emit('clickEvent');">
       <BlockTable BlockTable :contents="cardMap" class="cardMap"/>
       <p class="name">{{ name }}</p>
       <div class="count">
@@ -44,6 +44,7 @@ export default {
     select: { default: false },
     clickEvent: Function,
     isPass:Boolean,
+    isSp:Boolean,
   },
   data() {
     return {
@@ -56,11 +57,12 @@ export default {
       get: function () {
         return utils.splitArray(this.map,8);
       },
-    },
+    }
   },
   // watch: {
-  //   isSelect: function(newVal, oldVal) {
-  //     console.log(newVal, oldVal)
+  //   isSp: function(newVal) {
+  //     this.sp = newVal
+  //     console.log(this.sp)
   //   }
   // },
   mounted() {
@@ -81,6 +83,13 @@ export default {
 <style lang="scss">
 .CardItem{
   background-color: #eeffeb;
+}
+.gaming {
+  background: linear-gradient(to right, rgba(255, 0, 255, 0.5), rgba(255, 255, 0, 0.5), rgba(0, 255, 255, 0.5), rgba(255, 0, 255, 0.5)) 0% center/200%;
+  animation: gaming 2s linear infinite;
+  }
+@keyframes gaming {
+  100% { background-position-x: 200%; }
 }
 .card-item {
   width: 90px;

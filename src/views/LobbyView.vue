@@ -68,6 +68,7 @@ const loadRoomData = () => {
     store.commit("setStageObj", { obj: doc.get("stage") });
     users.forEach((user) => usersList.push(user));
     store.state.myUserObj = users[1 - store.state.enemyIndex];
+    store.state.gameDatas = doc.get("gameDatas")
     if (usersList.length == 2) {
       store.state.enemyUserObj = users[store.state.enemyIndex];
       startGame("準備OK");

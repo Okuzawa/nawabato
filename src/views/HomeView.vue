@@ -41,11 +41,19 @@ const createRoom = () => {
         userStatus: "準備中",
         userColor:"yellow"
       }
+      store.state.myActData = {
+        turn: 0,
+        type: "",
+        card: [],
+        virtualStage: [],
+      }
+      store.state.gameDatas = { [store.state.userId]: store.state.myActData }
       const data = {users: [store.state.myUserObj],};
       store.commit("createServer", { roomId: roomId.value });
       store.state.roomDocRef.set(data);
       store.state.stageObj = store.state.ms_stage[store.state.currentStage];
       store.state.roomDocRef.update({stage: store.state.stageObj});
+      store.state.roomDocRef.update({gameDatas: store.state.gameDatas});
       store.state.enemyIndex = 1;
       initRoom();
 }
@@ -66,7 +74,17 @@ const enterRoom = () => {
               userColor: "blue",
             }
             users.push(store.state.myUserObj);
+            store.state.myActData = {
+              turn: 0,
+              type: "",
+              cardId: [],
+              virtualStage: [],
+            }
+            let gameDatas = doc.get("gameDatas");
+            store.state.gameDatas = { ...gameDatas,[store.state.userId]: store.state.myActData }
+            gameDatas = store.state.gameDatas
             store.state.roomDocRef.update({ users });
+            store.state.roomDocRef.update({ gameDatas });
             initRoom();
           } 
           else message.value = "その部屋は満室です";

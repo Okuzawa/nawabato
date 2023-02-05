@@ -37,7 +37,10 @@ export default createStore({
     users: [],
     myUserObj:Object,
     enemyUserObj:Object,
+    
     gameDatas: Object,
+    myActData: Object,
+    enemyActData: Object,
   },
   getters: {
     getBlockSrc: (state) => (index) => {

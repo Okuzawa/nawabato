@@ -48,6 +48,16 @@ function serchAround(values, posY, posX, targetArea) {
     }
     return false
 }
+function serchAroundAll(values, posY, posX, targetArea) {
+    let result = []
+    for (let y = 0; y < 3; y++) {
+        for (let x = 0; x < 3; x++) {
+            if (values.some(value => value == targetArea[(posY - 1) + y][(posX - 1) + x])) result.push(true)
+            else result.push(false)
+        }
+    }
+    return result.every(value=>value)
+}
 
 export default {
     getTotalCount,
@@ -56,4 +66,5 @@ export default {
     shuffleArray,
     rotateArray,
     serchAround,
+    serchAroundAll,
 };
