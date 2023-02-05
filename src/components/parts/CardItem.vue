@@ -1,7 +1,7 @@
 <template>
   <div class="CardItem">
     <button v-if="id != 0" class="card-item btn btn-outline-secondary"
-      :class="{ active: isSelect,disabled: isDisabled }" @click="OnClick();$emit('clickEvent');">
+      :class="{ active: this.select.select,disabled: isDisabled }" @click="OnClick();$emit('clickEvent');">
       <BlockTable BlockTable :contents="cardMap" class="cardMap"/>
       <p class="name">{{ name }}</p>
       <div class="count">
@@ -14,6 +14,9 @@
     </button>
     <div v-else class="card-item">
       <h1>⊕</h1>
+    </div>
+    <div v-if="isPass" class = "isPass">
+      <h1>パス</h1>
     </div>
   </div>
 </template>
@@ -40,6 +43,7 @@ export default {
     isDisabled: { default: false },
     select: { default: false },
     clickEvent: Function,
+    isPass:Boolean,
   },
   data() {
     return {
@@ -66,9 +70,7 @@ export default {
   },
   methods: {
     OnClick: function () {
-      console.log(this.name)
       if (!this.enabled) return;
-      console.log(this.enabled)
       if (this.isSelect) this.isSelect = false;
       else this.isSelect = true;
     },
@@ -87,7 +89,6 @@ export default {
     width: 90px;
     height: 150px;
     background-color:#686868;
-    border: solid 3px #adadad;
     color: #adadad;
     display: flex;
     justify-content: center;
@@ -116,6 +117,21 @@ export default {
     vertical-align: top;
     line-height: 0.1;
     margin: -10px 0px;
+  }
+}
+.isPass{
+  pointer-events: none;
+  z-index: 1;
+  position: fixed;
+  margin-top: -150px;
+  width: 90px;
+  height: 150px;
+  background-color: rgba(228, 228, 228, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  h1{
+    color: #000000;
   }
 }
 .btn {

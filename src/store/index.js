@@ -37,6 +37,7 @@ export default createStore({
     users: [],
     myUserObj:Object,
     enemyUserObj:Object,
+    gameDatas: Object,
   },
   getters: {
     getBlockSrc: (state) => (index) => {

@@ -2,89 +2,215 @@
   <div v-if="gameTurn > 0">
   <h2>残り{{13-gameTurn}}ターン</h2>
   </div>
+
+  <div id="overlay" v-show="showContent">
+    <div id="content">
+      <div class="modal-body">
+        <div id="top-list">
+          <div class="container">
+            手札のカードを引き直しますか？
+          </div>
+        </div>
+      </div>
+      <div>
+        <button type="button" class="btn btn-secondary transitionBtn" @click="showContent = false">
+          <p>そのまま</p>
+        </button>
+        <button type="button" class="btn btn-secondary transitionBtn" @click="showContent = false; Mulligan();">
+          <p>引き直す</p>
+        </button>
+      </div>
+    </div>
+  </div>
   
   <div class="controller" v-if="gameTurn > -1">
     <GameHand class="hand" ref="useHand" :deck="hand" :canPlay ="canPlay" @pick="PickUpCard"/>
-    <button>パス</button>
-    <button @click="rotateCard">回転</button>
-    <button @click="isSp = !isSp">SP発動{{isSp?'OFF':'ON'}}</button>
-    <GameDeck :deck="myDeck"/>
+    <button v-if="turnPhase == 'play'" @click="changePlayerMode('pass')">パス</button>
+    <button v-if="turnPhase == 'play'" @click="changePlayerMode('sp')">SP発動{{playerMode == 'sp'?'ON':'OFF'}}</button>
+    <button v-if="turnPhase == 'play'" @click="rotateCard">回転</button>
+    <GameDeck :deck="myDeck" :usedCard="usedCard"/>
   </div>
+
   <div class="container">
     <div class="stage">
       <div>
         <BlockTable class="viewStage" :contents="utils.splitArray(stageMap, store.state.stageSideLength)" />
-        <BlockTable class="virtualStage" :class="{ gray: !canPut }"
+        <BlockTable class="virtualStage" :class="{ gray: !canPut, tempFix: !showMyCard}"
         :contents="utils.splitArray(virtualStage, store.state.stageSideLength)" 
         :selectCard="utils.splitArray(selectCard.map, 8)"
         @pick="putCard"/>
+        <div class="panel" v-if="playerMode == 'pass'">
+          <h1 style="color: white">どのカードを捨てる？</h1>
+        </div>
+        <div class="panel" v-if="turnPhase == 'waitting'">
+          <h1 style="color: white">相手の行動を待っています...</h1>
+        </div>
       </div>
     </div>
     <div class="playerData">
-      <CardItem :id="store.getters.findCardById(0).id" :name="store.getters.findCardById(0).name" 
-      :count="store.getters.findCardById(0).count" :cost="store.getters.findCardById(0).cost" :map="store.getters.findCardById(0).map"
-      :block="store.getters.getBlockSrc(1)"
-      :sp_block="store.getters.getBlockSrc(2)"/>
+      <CardFlip class="enemyCard" :isFaceUp="showEnemyCard">
+        <template #face>
+          <CardItem :id="store.getters.findCardById(3).id" :name="store.getters.findCardById(3).name" 
+          :count="store.getters.findCardById(3).count" :cost="store.getters.findCardById(3).cost" :map="store.getters.findCardById(3).map"
+          :block="store.getters.getBlockSrc(1)"
+          :sp_block="store.getters.getBlockSrc(2)"/>
+        </template>
+        <template #back>
+          <CardSleeve/>
+        </template>
+      </CardFlip>
       <div class = "data" :class="(store.state.enemyUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">
-        <p>name : sp00</p>
+        <p>{{store.state.enemyUserObj.name}} : sp00</p>
         <h1>00</h1>  
       </div>
       <div class = "data" :class="(store.state.myUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">
         <h1>00</h1>
-        <p>name : sp00</p>
+        <p>{{store.state.myUserObj.name}} : sp{{spPoint}}</p>
       </div>
-      <CardItem :id="store.getters.findCardById(0).id" :name="store.getters.findCardById(0).name" 
-      :count="store.getters.findCardById(0).count" :cost="store.getters.findCardById(0).cost" :map="store.getters.findCardById(0).map"
-      :block="store.getters.getBlockSrc(1)"
-      :sp_block="store.getters.getBlockSrc(2)"/>
+      <CardFlip :isFaceUp="showMyCard">
+        <template #face>
+          <CardItem @click="setCard" :id="selectCard.id" :name="selectCard.name" 
+          :count="selectCard.count" :cost="selectCard.cost" :map="selectCard.map"
+          :block="store.getters.getBlockSrc(1)"
+          :sp_block="store.getters.getBlockSrc(2)"
+          :isPass="playerMode == 'pass'?true:false"/>
+        </template>
+        <template #back>
+          <CardSleeve/>
+        </template>
+      </CardFlip>
     </div>
   </div>
-  <button @click="merge">マージ</button>
-  <button @click="canPlay.length = 0;">reset</button>
-  <button @click="addHand">add</button>
 </template>
 
 <script setup scoped>
-import { ref,onMounted } from "vue";
+import { ref,onMounted,watch } from "vue";
 import store from "@/store";
 import utils from "@/utils";
 import BlockTable from "@/components/parts/BlockTable.vue";
 import GameDeck from "@/components/GameDeck.vue";
 import GameHand from "@/components/GameHand.vue";
 import CardItem from "@/components/parts/CardItem.vue";
+import CardFlip from "@/components/parts/CardFlip.vue";
+import CardSleeve from "@/components/parts/CardSleeve.vue";
 
 const useHand = ref();
+const myBlock = setMyBlock()
+const showContent = ref(false);
+const showEnemyCard = ref(false);
+const showMyCard = ref(true);
 
 let gameTurn = ref(1);
 let stageMap = ref(store.state.stageObj.map);
-// let stageMap = ref(store.state.ms_stage[3].map);
 let virtualStage = ref(store.state.ms_stage[0].map);
+let selectCardIndex = ref(0)
 let selectCard = ref(store.state.ms_card[0]);
 let canPut = ref(true);
 let posIndex = ref(798);
 let myDeck = ref([]);
+let useDeck = ref([]);
+let usedCard = ref([])
 let hand = ref([]);
 let canPlay = ref([]);
-let isSp = ref(false);
-const myBlock = setMyBlock()
+let spPoint = ref(2);
+let playerMode = ref("");
+let turnPhase = ref("")
 
-function addHand(){
-  hand.value[3] = store.getters.findCardById(90)
-  useHand.value.updata(hand.value)
+function changePlayerMode(mode){
+  if(playerMode.value == mode) mode = 'normal'
+  playerMode.value = mode
+  store.state.gameDatas = {mode}
+}
+
+function changeTurnPhase(mode){
+  turnPhase.value = mode
+}
+
+function setCard(){
+  if(selectCard.value.id == 0) return
+  if(playerMode.value != 'pass' && !canPut.value) return
+  showMyCard.value = false
+  changeTurnPhase('waitting')
+  setTimeout(() => {
+    turnUpdata()
+  }, 1000);
+}
+
+function turnUpdata(){
+  showMyCard.value = true
+  merge();
+  if(13-gameTurn.value <= 1) return
+  if(playerMode.value == 'pass') spPoint.value++
+  changeTurnPhase('play')
+  playerMode.value = ''
+  draw();
+  gameTurn.value++
+}
+
+watch(playerMode,(cr)=>{
+  canPlay.value = [];
+  switch (cr) {
+    case 'normal':
+      selectCard.value = store.state.ms_card[0]
+      checkPlayHand(hand.value)
+      putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
+      break;
+    case 'sp':
+      selectCard.value = store.state.ms_card[0]
+      checkPlayHand(hand.value)
+      putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
+      break;
+    case 'pass':
+      canPlay.value = hand.value.map(value => value)
+      putCard(utils.splitArray(store.state.ms_card[0].map,8),posIndex.value,-3,-3)
+      break;
+    default:
+      break;
+  }
+})
+
+watch(()=>store.state.gameDatas,(cr)=>{
+  console.log(cr);
+})
+
+function draw(){
+  let drawCard = useDeck.value[gameTurn.value+3];
+  usedCard.value.push(drawCard);
+  hand.value.splice(selectCardIndex.value,1,drawCard);
+  useHand.value.updata(hand.value);
+  setTimeout(() => changePlayerMode('normal'), 100);
 }
 
 function init(){
   loadMydeck()
-  Mulligan()
-  canPlay.value.push(store.getters.findCardById(34))
-  canPlay.value.push(store.getters.findCardById(159))
+  firestDraw()
 }
 init()
 
 onMounted(() => {
   useHand.value.firestDrawCard();
-  // PickUpCard(0);
+  setTimeout(() => {
+    showContent.value = true;
+    changePlayerMode('normal');
+    changeTurnPhase('play');
+  }, 2200);
 });
+
+function checkPlayHand(hand){
+  let stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
+  hand.forEach((card) => {
+    if(playerMode.value == 'sp' && card.cost > spPoint.value) return
+    let cardMap = utils.splitArray(card.map,8)
+    for (let i = 0; i < 4; i++) {
+      let rotatedMap = utils.rotateArray(cardMap,8)
+      for (let y = 0; y < 26; y++) {
+        for(let x = 0; x < 26; x++){
+          if( checkPutCard(rotatedMap,y,x,stage)) { canPlay.value.push(card);return; }
+        }
+      }
+    }
+  });
+}
 
 function loadMydeck(){
   let deck = store.state.tb_deckList[store.state.currentDeck].deck;
@@ -94,7 +220,6 @@ function loadMydeck(){
     myDeck.value = blueDeck
   }
 }
-
 function replaceToBlue(cardList) {
   return cardList.map(card => { let blueMap = card.map.map(value => {
     if (value != 0) return value + 1
@@ -103,29 +228,42 @@ function replaceToBlue(cardList) {
     return { ...card, map: blueMap }
   });
 }
-
 function setMyBlock(){
   return store.state.myUserObj.userColor == 'blue' ? {normal:2,sp:4}:{normal:1,sp:3}
 }
-
-function Mulligan(){
+function firestDraw(){
   let tempHand = [];
+  useDeck.value = utils.shuffleArray(myDeck.value)
   for (let i = 0; i < 4; i++) {
-    tempHand.push(myDeck.value[i])
+    tempHand.push(useDeck.value[i])
+    usedCard.value.push(useDeck.value[i])
   }
   hand.value = tempHand
 }
 
+function Mulligan(){
+  hand.value.length = 0
+  useHand.value.updata(hand.value)
+  changePlayerMode('')
+  setTimeout(() => {
+    firestDraw();
+    useHand.value.updata(hand.value);
+    changePlayerMode('normal');
+  }, 1000);
+  
+}
+
 function PickUpCard(index){
+  selectCardIndex.value = index
+  if(-1 == canPlay.value.indexOf(hand.value[index])) return
   selectCard.value = hand.value[index]
+  if(playerMode.value == 'pass') return
   putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
 }
 
 function merge(){
-  if(!canPut.value) return
   stageMap.value = virtualStage.value.map((value, index) => {
     return value == 8 ? stageMap.value[index]:virtualStage.value[index] });
-  gameTurn.value++
 }
 
 function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
@@ -149,7 +287,7 @@ function checkPutCard (cardMap, stageOffsetY,stageOffsetX,stage){
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
       if(cardMap[y][x] != 0){
-        if(isSp.value){
+        if(playerMode.value == 'sp'){
           if(stage[y+stageOffsetY][x+stageOffsetX] > 2) return false
           aroundResult.push(utils.serchAround([myBlock.sp],y+stageOffsetY,x+stageOffsetX,stage))
         }
@@ -165,6 +303,7 @@ function checkPutCard (cardMap, stageOffsetY,stageOffsetX,stage){
 }
 
 function rotateCard(){
+  if(playerMode.value == 'pass') return
   let rotatedMap = utils.rotateArray(utils.splitArray(selectCard.value.map,8),8)
   selectCard.value.map = rotatedMap.flat()
   putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
@@ -177,7 +316,6 @@ function rotateCard(){
   justify-content: center;
     .playerData{
       z-index: 1;
-      pointer-events: none;
       padding-top: 260px;
       margin-left: -400px;
       transform: scale(0.8);
@@ -189,6 +327,9 @@ function rotateCard(){
       }
       .blue{
         color: blue
+      }
+      .enemyCard{
+        pointer-events: none;
       }
     }
     .stage {
@@ -203,8 +344,23 @@ function rotateCard(){
       z-index: 1;
       img{ filter: opacity(50%);}
     }
+    .panel{
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     .gray{
       img{ filter: opacity(50%) grayscale(100%);}
+    }
+    .tempFix{
+      img{ filter: opacity(100%); }
     }
   }
 }
@@ -214,7 +370,9 @@ function rotateCard(){
   position: relative;
   z-index: 2;
   .hand{
-    width: 480px;
+    padding-right: 10px;
+    width: 460px;
+    height: 150px;
     transform: scale(0.75);
   }
 }
