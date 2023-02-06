@@ -232,6 +232,8 @@ function PickUpCard(index){
   putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
 }
 function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
+  if(turnPhase.value != 'play') return
+  if(playerMode.value == 'pass') return
   let temp = utils.splitArray(store.state.ms_stage[0].map, store.state.stageSideLength)
   posIndex.value = _index
   let index = _index+offsetX+(offsetY*store.state.stageSideLength)
@@ -257,6 +259,7 @@ function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
 }
 
 function updataTurn(){
+  changeTurnPhase('show')
   gameTurn.value++
   showMyCard.value = true
   showEnemyCard.value = true
