@@ -1,8 +1,4 @@
 <template>
-  <label
-    >選択中のデッキ ：
-    {{ store.state.tb_deckList[store.state.currentDeck].name }}</label
-  >
   <button @click="openModal">デッキ変更</button>
   <button @click="resetData">データ削除</button>
 

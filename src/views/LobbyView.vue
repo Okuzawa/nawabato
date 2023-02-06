@@ -53,6 +53,8 @@ import "firebase/compat/firestore";
 import BlockTable from "@/components/parts/BlockTable.vue";
 import utils from "@/utils";
 
+store.state.currentDeck = 0;
+
 const loadRoomData = () => {
   let usersList = store.state.users;
   store.state.roomDocRef.onSnapshot((doc) => {

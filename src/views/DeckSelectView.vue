@@ -20,7 +20,7 @@
           <p>読み込み中</p>
         </div>
         <div v-else id="top-list">
-          <DeckListView />
+          <DeckListLoby />
         </div>
       </div>
     </div>
@@ -31,7 +31,7 @@
 import { ref } from "vue";
 import store from "@/store";
 
-import DeckListView from "@/views/DeckListView.vue";
+import DeckListLoby from "@/views/DeckListLoby.vue";
 
 const showContent = ref(false);
 const openModal = () => {
