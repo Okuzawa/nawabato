@@ -67,4 +67,30 @@ const props = defineProps({
 .container::-webkit-scrollbar {
   display: none;
 }
+
+#overlay {
+  z-index: 5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .transitionBtn {
+    height: 35px;
+  }
+}
+#content {
+  z-index: 2;
+  width: 100%;
+  padding: 1em;
+  background: #fff;
+}
+#top-list {
+  margin: 0px -100px;
+}
 </style>

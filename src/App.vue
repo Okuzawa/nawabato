@@ -1,9 +1,9 @@
 <template>
   <div v-if="store.state.gameMainPhase == 0">
     <h2>ナワバトラー</h2>
-    <button @click="store.state.gameMainPhase = 2">debug</button>
     <HomeView />
     <DeckManagerView />
+    <img id="rule" src="@/assets/image/rule.png">
   </div>
   <div v-else-if="store.state.gameMainPhase == 1">
     <h2>ロビー</h2>
@@ -62,5 +62,9 @@ init();
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+}
+#rule{
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -27,9 +27,9 @@
     <div id="content">
       <div class="modal-body">
         <div id="top-list">
-          <div><h2>結果</h2></div>
+          <div><h3>結果</h3></div>
           <div>
-            <h1>{{store.state.myUserObj.userName}}:{{myCount}} VS {{store.state.enemyUserObj.userName}}:{{enemyCount}}</h1>
+            <h2>{{store.state.myUserObj.userName}}:{{myCount}} VS {{store.state.enemyUserObj.userName}}:{{enemyCount}}</h2>
           </div>
         </div>
       </div>
@@ -41,7 +41,7 @@
     </div>
   </div>
   
-  <div class="controller" v-if="gameTurn > -1">
+  <div class="controller">
     <GameHand class="hand" ref="useHand" :deck="hand" :canPlay ="canPlay" @pick="PickUpCard"/>
     <button v-if="turnPhase == 'play'" @click="changePlayerMode('pass')">パス</button>
     <button v-if="turnPhase == 'play'" @click="changePlayerMode('sp')">SP発動{{playerMode == 'sp'?'ON':'OFF'}}</button>
@@ -55,8 +55,7 @@
         <BlockTable class="viewStage" :contents="utils.splitArray(stageMap, store.state.stageSideLength)" />
         <BlockTable class="virtualStage" :class="{ gray: !canPut, tempFix: !showMyCard}"
         :contents="utils.splitArray(virtualStage, store.state.stageSideLength)" 
-        :selectCard="utils.splitArray(selectCard.map, 8)"
-        @pick="putCard"/>
+        :selectCard="utils.splitArray(selectCard.map, 8)" @pick="putCard"/>
         <div class="panel" v-if="playerMode == 'pass'">
           <h1 style="color: white">どのカードを捨てる？</h1>
         </div>
@@ -116,6 +115,8 @@ import CardSleeve from "@/components/parts/CardSleeve.vue";
 const useHand = ref();
 const myBlock = setMyBlock()
 const enemyBlock = setEnemyBlock()
+const targetNormal = [1, 2]
+const targetSp = [3, 4]
 const showContent = ref(false);
 const showEnemyCard = ref(false);
 const showMyCard = ref(true);
@@ -143,40 +144,36 @@ let myCount = ref(1);
 let enemyCount = ref(1);
 let myTempCount = ref(0);
 let enemyTempCount = ref(0);
-
 let tempMySpPoint = 0;
 let tempEnemySpPoint = 0;
 
+function init(){
+  loadMydeck()
+  firestDraw()
+}
+init()
+
+onMounted(() => {
+  useHand.value.firestDrawCard();
+  setTimeout(() => {
+    showContent.value = true;
+    changePlayerMode('normal');
+  }, 2200);
+});
 function StartGame(){
   showContent.value = false;
   gameTurn.value++;
+  changeTurnPhase('play');
 }
-
-function changePlayerMode(mode){
-  if(playerMode.value == mode) mode = 'normal'
-  playerMode.value = mode
-}
-
-function changeTurnPhase(mode){
-  turnPhase.value = mode
-}
-
-function setCard(){
-  if(selectCard.value.id == 0) return
-  if(playerMode.value != 'pass' && !canPut.value) return
-  showMyCard.value = false
-  changeTurnPhase('waitting')
-  writeMyActData()
-}
-
-function writeMyActData(){
-  store.state.myActData = { turn: gameTurn.value, type: playerMode.value, card: selectCard.value, virtualStage: virtualStage.value }
-
-  store.state.roomDocRef.get().then((doc) => {
-    let gameDatas = doc.get("gameDatas");
-    gameDatas = {...gameDatas, [store.state.userId]: store.state.myActData }
-    store.state.roomDocRef.update({ gameDatas });
-  });
+function Mulligan(){
+  hand.value.length = 0
+  useHand.value.updata(hand.value)
+  changePlayerMode('')
+  setTimeout(() => {
+    firestDraw();
+    useHand.value.updata(hand.value);
+    changePlayerMode('normal');
+  }, 1000);
 }
 
 watch(playerMode,(cr)=>{
@@ -200,7 +197,6 @@ watch(playerMode,(cr)=>{
       break;
   }
 })
-
 watch(()=>store.state.gameDatas,(cr)=>{
   store.state.enemyActData = cr[store.state.enemyUserObj.userId]
   if( store.state.myActData.turn==store.state.enemyActData.turn ){
@@ -208,58 +204,168 @@ watch(()=>store.state.gameDatas,(cr)=>{
     updataTurn()
   }
 })
+
+function setCard(){
+  if(selectCard.value.id == 0) return
+  if(playerMode.value != 'pass' && !canPut.value) return
+  if(turnPhase.value != 'play') return
+  showMyCard.value = false
+  changeTurnPhase('waitting')
+  writeMyActData()
+}
+function changePlayerMode(mode){
+  if(playerMode.value == mode) mode = 'normal'
+  playerMode.value = mode
+}
+function rotateCard(){
+  if(playerMode.value == 'pass') return
+  let rotatedMap = utils.rotateArray(utils.splitArray(selectCard.value.map,8),8)
+  selectCard.value.map = rotatedMap.flat()
+  putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
+}
+function PickUpCard(index){
+  if(turnPhase.value != 'play') return
+  selectCardIndex.value = index
+  if(-1 == canPlay.value.indexOf(hand.value[index])) return
+  selectCard.value = hand.value[index]
+  if(playerMode.value == 'pass') return
+  putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
+}
+function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
+  let temp = utils.splitArray(store.state.ms_stage[0].map, store.state.stageSideLength)
+  posIndex.value = _index
+  let index = _index+offsetX+(offsetY*store.state.stageSideLength)
+  const stageOffsetY = Math.floor(index / store.state.stageSideLength)
+  const stageOffsetX = index%store.state.stageSideLength
+  for (let y = 0; y < 8; y++) {
+    for (let x = 0; x < 8; x++) {
+      if(cardMap[y][x] != 0) temp[y+stageOffsetY][x+stageOffsetX]=cardMap[y][x]
+    }
+  }
+  virtualStage.value = temp.flat()
+  const stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
+  canPut.value = checkPutCard(cardMap,stageOffsetY,stageOffsetX,stage)
+
+  if (canPut.value) {
+    tempStageMap.value = stageMap.value.map(value=>value)
+    tempStageMap.value = virtualStage.value.map((value, index) => {
+    return value == 8 ? tempStageMap.value[index]:virtualStage.value[index] });
+    myTempCount.value = tempStageMap.value.filter(value=> value==myBlock.sp || value==myBlock.normal).length-myCount.value
+    enemyTempCount.value = tempStageMap.value.filter(value=> value==enemyBlock.sp || value==enemyBlock.normal).length-enemyCount.value
+  }
+  else myTempCount.value = 0
+}
+
 function updataTurn(){
+  gameTurn.value++
   showMyCard.value = true
   showEnemyCard.value = true
+
   if(store.state.myActData.type == 'pass') tempMySpPoint++
   if(store.state.enemyActData.type == 'pass') tempEnemySpPoint++
-  mergeAct()
-  if(13-gameTurn.value <= 1) {
-    changePlayerMode('gameEnd')
-  }
-  else{
-    setTimeout(() => startTurn(), 2000);
-  }
+
+  if(store.state.myActData.type == 'sp') tempMySpPoint -= selectCard.value.cost
+  if(store.state.enemyActData.type == 'sp') tempEnemySpPoint -= enemySelectCard.value.cost
+  
+  showDown()
+
+  setTimeout(() => {
+    countPoint()
+    countSp()
+    setTimeout(()=>{
+      if(gameTurn.value > 12) gameEnd()
+      // if(gameTurn.value > 1) gameEnd()
+      else startTurn()
+    },1500);
+  }, 1500);
 }
 function startTurn(){
   showEnemyCard.value = false
   changeTurnPhase('play')
   playerMode.value = ''
   draw();
-  gameTurn.value++
 }
-function mergeAct(){
+function gameEnd(){
+  changeTurnPhase('gameEnd')
+  changePlayerMode('gameEnd');
+}
+function showDown(){
   let tempMap = utils.splitArray(store.state.enemyActData.virtualStage, store.state.stageSideLength)
   tempMap = utils.rotateArray(tempMap, store.state.stageSideLength)
   tempMap = utils.rotateArray(tempMap, store.state.stageSideLength)
-  store.state.enemyActData.virtualStage = tempMap.flat()
 
-  let tempSerch = []
-  if(selectCard.value.count < enemySelectCard.value.count){
-    virtualStage.value = store.state.enemyActData.virtualStage;
-    mergeStage();
-    virtualStage.value = store.state.myActData.virtualStage;
-    mergeStage();
+  let myStage = store.state.myActData.virtualStage
+  let enemyStage = tempMap.flat()
+
+  let myEvaluation = 0
+  let enemyEvaluation = 0
+  if (selectCard.value.count < enemySelectCard.value.count) myEvaluation++
+  else if (selectCard.value.count > enemySelectCard.value.count) myEvaluation--
+  if (store.state.myActData.type == 'sp' && store.state.enemyActData.type == 'normal') myEvaluation+=2
+  else if (store.state.myActData.type == 'normal' && store.state.enemyActData.type == 'sp') myEvaluation-=2
+  if (store.state.myActData.type == 'pass') myEvaluation-=5
+  if (store.state.enemyActData.type == 'pass') enemyEvaluation-=5
+
+  if (myEvaluation == enemyEvaluation) {
+    let temp = mergeCard(myStage,enemyStage)
+    stageMap.value = mergeStage(stageMap.value,temp)
   }
-  else if(enemySelectCard.value.count < selectCard.value.count){
-    virtualStage.value = store.state.myActData.virtualStage;
-    mergeStage();
-    virtualStage.value = store.state.enemyActData.virtualStage;
-    mergeStage();
+  else if (myEvaluation > enemyEvaluation) {
+    stageMap.value = mergeStage(stageMap.value,enemyStage)
+    setTimeout(() => {
+      stageMap.value = mergeStage(stageMap.value,myStage)
+    }, 1000);
   }
-  else if(selectCard.value.count == enemySelectCard.value.count){
-    tempSerch = [1,2,3,4]
-    console.log(tempSerch)
-    let buffMyStage = store.state.myActData.virtualStage;
-    let buffenemyStage = store.state.enemyActData.virtualStage;
-    virtualStage.value = buffenemyStage.map((value,index)=>{
-      if(value == buffMyStage[index] && value == 1 || value == 2) {
-        console.log("ge"); 
-        return 7}
-      else return value 
-    })
-    mergeStage()
+  else if (myEvaluation < enemyEvaluation) {
+    stageMap.value = mergeStage(stageMap.value,myStage)
+    setTimeout(()=>{
+      stageMap.value = mergeStage(stageMap.value,enemyStage)
+    }, 1000)
   }
+}
+function mergeStage(original,target) {
+  return target.map((value, index) => {
+    if (targetSp.some(el => el == original[index]) && targetNormal.some(el => el == value)) return original[index]
+    return value == 8 ? original[index] : target[index]
+  });
+}
+function mergeCard(card1,card2) {
+  // cardにはそれぞれ1,3 2,4 8 が入ってる
+  return card1.map((value, index) => {
+    if (value == 8 && card2[index] != 8) return card2[index]
+    else if (value != 8 && card2[index] == 8) return value
+
+    //ここで通常マス(1,2)とSPマス(3,4)それぞれをぶつけてる
+    if (targetSp.some(el => el == value) && targetSp.some(el => el == card2[index]) == targetSp.some(el => el == value)) return 7
+    else if (targetNormal.some(el => el == value) && targetNormal.some(el => el == card2[index]) == targetNormal.some(el => el == value)) return 7
+
+    //ここで比較がでるのは通常マスとSPマスのみ
+    else if (value > card2[index]) return value
+    else if (value < card2[index]) return card2[index]
+    else return value
+  })
+}
+function countPoint(){
+  myCount.value = stageMap.value.filter(value=> value==myBlock.sp || value==myBlock.normal).length
+  enemyCount.value = stageMap.value.filter(value=> value==enemyBlock.sp || value==enemyBlock.normal).length
+}
+function countSp(){
+  const stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
+  stageMap.value = stageMap.value.map((value,index)=>{
+    const stagePosY = Math.floor(index / store.state.stageSideLength)
+    const stagePosX = index%store.state.stageSideLength
+    if(value == myBlock.sp){
+      if( utils.serchAroundAll([1,2,3,4,5,6,7,8], stagePosY, stagePosX, stage) ) return myBlock.fireSp
+      else return value
+    }
+    else if(value == enemyBlock.sp){
+      if( utils.serchAroundAll([1,2,3,4,5,6,7,8], stagePosY, stagePosX, stage) ) return enemyBlock.fireSp
+      else return value
+    }
+    else return value
+  })
+  mySpPoint.value = stageMap.value.filter(value=> value==myBlock.fireSp).length + tempMySpPoint
+  enemySpPoint.value = stageMap.value.filter(value=> value==enemyBlock.fireSp).length + tempEnemySpPoint
 }
 
 function draw(){
@@ -269,21 +375,6 @@ function draw(){
   useHand.value.updata(hand.value);
   setTimeout(() => changePlayerMode('normal'), 100);
 }
-
-function init(){
-  loadMydeck()
-  firestDraw()
-}
-init()
-
-onMounted(() => {
-  useHand.value.firestDrawCard();
-  setTimeout(() => {
-    showContent.value = true;
-    changePlayerMode('normal');
-    changeTurnPhase('play');
-  }, 2200);
-});
 
 function checkPlayHand(hand){
   let stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
@@ -298,6 +389,20 @@ function checkPlayHand(hand){
         }
       }
     }
+  });
+}
+
+function changeTurnPhase(mode){
+  turnPhase.value = mode
+}
+
+function writeMyActData(){
+  store.state.myActData = { turn: gameTurn.value, type: playerMode.value, card: selectCard.value, virtualStage: virtualStage.value }
+
+  store.state.roomDocRef.get().then((doc) => {
+    let gameDatas = doc.get("gameDatas");
+    gameDatas = {...gameDatas, [store.state.userId]: store.state.myActData }
+    store.state.roomDocRef.update({ gameDatas });
   });
 }
 
@@ -333,77 +438,6 @@ function firestDraw(){
   hand.value = tempHand
 }
 
-function Mulligan(){
-  hand.value.length = 0
-  useHand.value.updata(hand.value)
-  changePlayerMode('')
-  setTimeout(() => {
-    firestDraw();
-    useHand.value.updata(hand.value);
-    changePlayerMode('normal');
-  }, 1000);
-  
-}
-
-function PickUpCard(index){
-  selectCardIndex.value = index
-  if(turnPhase.value != 'play') return
-  if(-1 == canPlay.value.indexOf(hand.value[index])) return
-  selectCard.value = hand.value[index]
-  if(playerMode.value == 'pass') return
-  putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
-}
-
-function mergeStage(){
-  stageMap.value = virtualStage.value.map((value, index) => {
-    return value == 8 ? stageMap.value[index]:virtualStage.value[index] });
-
-  myCount.value = stageMap.value.filter(value=> value==myBlock.sp || value==myBlock.normal).length
-  enemyCount.value = stageMap.value.filter(value=> value==enemyBlock.sp || value==enemyBlock.normal).length
-
-  const stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
-  stageMap.value = stageMap.value.map((value,index)=>{
-    const stagePosY = Math.floor(index / store.state.stageSideLength)
-    const stagePosX = index%store.state.stageSideLength
-    if(value == myBlock.sp){
-      if( utils.serchAroundAll([1,2,3,4,5,6,7,8], stagePosY, stagePosX, stage) ) return myBlock.fireSp
-      else return value
-    }
-    else if(value == enemyBlock.sp){
-      if( utils.serchAroundAll([1,2,3,4,5,6,7,8], stagePosY, stagePosX, stage) ) return enemyBlock.fireSp
-      else return value
-    }
-    else return value
-  })
-  mySpPoint.value = stageMap.value.filter(value=> value==myBlock.fireSp).length + tempMySpPoint
-  enemySpPoint.value = stageMap.value.filter(value=> value==enemyBlock.fireSp).length + tempEnemySpPoint
-}
-
-function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
-  let temp = utils.splitArray(store.state.ms_stage[0].map, store.state.stageSideLength)
-  posIndex.value = _index
-  let index = _index+offsetX+(offsetY*store.state.stageSideLength)
-  const stageOffsetY = Math.floor(index / store.state.stageSideLength)
-  const stageOffsetX = index%store.state.stageSideLength
-  for (let y = 0; y < 8; y++) {
-    for (let x = 0; x < 8; x++) {
-      if(cardMap[y][x] != 0) temp[y+stageOffsetY][x+stageOffsetX]=cardMap[y][x]
-    }
-  }
-  virtualStage.value = temp.flat()
-  const stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
-  canPut.value = checkPutCard(cardMap,stageOffsetY,stageOffsetX,stage)
-
-  if (canPut.value) {
-    tempStageMap.value = stageMap.value.map(value=>value)
-    tempStageMap.value = virtualStage.value.map((value, index) => {
-    return value == 8 ? tempStageMap.value[index]:virtualStage.value[index] });
-    myTempCount.value = tempStageMap.value.filter(value=> value==myBlock.sp || value==myBlock.normal).length-myCount.value
-    enemyTempCount.value = tempStageMap.value.filter(value=> value==enemyBlock.sp || value==enemyBlock.normal).length-enemyCount.value
-  }
-  else myTempCount.value = 0
-}
-
 function checkPutCard (cardMap, stageOffsetY,stageOffsetX,stage){
   let aroundResult =[]
   for (let y = 0; y < 8; y++) {
@@ -422,16 +456,9 @@ function checkPutCard (cardMap, stageOffsetY,stageOffsetX,stage){
   }
   return aroundResult.some(value => value)
 }
-
-function rotateCard(){
-  if(playerMode.value == 'pass') return
-  let rotatedMap = utils.rotateArray(utils.splitArray(selectCard.value.map,8),8)
-  selectCard.value.map = rotatedMap.flat()
-  putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
-}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .container{
   display: flex;
   justify-content: center;
@@ -467,7 +494,7 @@ function rotateCard(){
     .virtualStage{
       margin-top: -1088px;
       z-index: 1;
-      img{ filter: opacity(50%);}
+      filter: opacity(50%);
     }
     .panel{
       position: fixed;
@@ -482,10 +509,10 @@ function rotateCard(){
       justify-content: center;
     }
     .gray{
-      img{ filter: opacity(50%) grayscale(100%);}
+      filter: opacity(50%) grayscale(100%);
     }
     .tempFix{
-      img{ filter: opacity(100%); }
+      filter: opacity(100%);
     }
   }
 }
@@ -504,7 +531,6 @@ function rotateCard(){
 
 #overlay {
   z-index: 5;
-
   position: fixed;
   top: 0;
   left: 0;
