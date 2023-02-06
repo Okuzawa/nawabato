@@ -372,7 +372,7 @@ function countSp(){
 }
 
 function draw(){
-  let drawCard = useDeck.value[gameTurn.value+3];
+  let drawCard = useDeck.value[gameTurn.value+2];
   usedCard.value.push(drawCard);
   hand.value.splice(selectCardIndex.value,1,drawCard);
   useHand.value.updata(hand.value);
