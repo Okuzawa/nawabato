@@ -64,7 +64,7 @@ init();
   color: #2c3e50;
 }
 #rule{
-  width: 100%;
-  height: 100%;
+  width: 50%;
+  height: 50%;
 }
 </style>
