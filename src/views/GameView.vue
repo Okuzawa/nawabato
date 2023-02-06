@@ -56,7 +56,7 @@
         <BlockTable class="virtualStage" :class="{ gray: !canPut, tempFix: !showMyCard}"
         :contents="utils.splitArray(virtualStage, store.state.stageSideLength)" 
         :selectCard="utils.splitArray(selectCard.map, 8)" @pick="putCard"/>
-        <div class="panel" v-if="playerMode == 'pass'">
+        <div class="panel" v-if="playerMode == 'pass' && turnPhase == 'play'">
           <h1 style="color: white">どのカードを捨てる？</h1>
         </div>
         <div class="panel" v-if="turnPhase == 'waitting'">
