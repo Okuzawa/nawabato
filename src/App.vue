@@ -3,7 +3,9 @@
     <h2>ナワバトラー</h2>
     <HomeView />
     <DeckManagerView />
-    <img id="rule" src="@/assets/image/rule.png">
+    <div>
+      <img id="rule" src="@/assets/image/rule.png">
+    </div>
   </div>
   <div v-else-if="store.state.gameMainPhase == 1">
     <h2>ロビー</h2>
