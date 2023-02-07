@@ -28,7 +28,7 @@
       <h3>結果</h3>
     </div>
     <div>
-      <h2>{{store.state.myUserObj.userName}}:{{myCount}} VS {{store.state.enemyUserObj.userName}}:{{enemyCount}}</h2>
+      <h2>{{store.state.myUserObj.userName}}:{{myPoint}} VS {{store.state.enemyUserObj.userName}}:{{enemyPoint}}</h2>
     </div>
   </div>
   
@@ -70,12 +70,12 @@
       </CardFlip>
       <div class = "data" :class="(store.state.enemyUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">
         <p>{{store.state.enemyUserObj.userName}} : sp{{enemySpPoint}}</p>
-        <h1>{{enemyCount}}</h1>
-        <h3 v-if="enemyTempCount != 0" class="enemyPoint">+{{enemyTempCount}}</h3>
+        <h1>{{enemyPoint}}</h1>
+        <h3 v-if="enemyExpectedPoint != 0" class="enemyPoint">+{{enemyExpectedPoint}}</h3>
       </div>
       <div class = "data" :class="(store.state.myUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">
-        <h1>{{myCount}}</h1>
-        <h3 v-if="myTempCount != 0" class="myPoint">+{{myTempCount}}</h3>
+        <h1>{{myPoint}}</h1>
+        <h3 v-if="myExpectedPoint != 0" class="myPoint">+{{myExpectedPoint}}</h3>
         <p>{{store.state.myUserObj.userName}} : sp{{mySpPoint}}</p>
       </div>
       <CardFlip :isFaceUp="showMyCard">
@@ -97,6 +97,7 @@
 import { ref,onMounted,watch } from "vue";
 import store from "@/store";
 import utils from "@/utils";
+import game from "@/game";
 import BlockTable from "@/components/parts/BlockTable.vue";
 import GameDeck from "@/components/GameDeck.vue";
 import GameHand from "@/components/GameHand.vue";
@@ -105,10 +106,9 @@ import CardFlip from "@/components/parts/CardFlip.vue";
 import CardSleeve from "@/components/parts/CardSleeve.vue";
 
 const useHand = ref();
-const myBlock = setMyBlock()
-const enemyBlock = setEnemyBlock()
-const normalBlock = [1, 2]
-const spBlock = [3, 4]
+const myBlock = game.setBlock(store.state.myUserObj.userColor)
+const enemyBlock = game.setBlock(store.state.enemyUserObj.userColor)
+
 const showContent = ref(false);
 const showEnemyCard = ref(false);
 const showMyCard = ref(true);
@@ -122,20 +122,18 @@ let enemySelectCard = ref(store.state.ms_card[0]);
 let canPut = ref(true);
 let posIndex = ref(798);
 let myDeck = ref([]);
-let useDeck = ref([]);
 let usedCard = ref([])
 let hand = ref([]);
 let canPlayCard = ref([]);
 let playerMode = ref("");
 let turnPhase = ref("")
 
-let tempStageMap = []
+let myPoint = ref(1);
+let enemyPoint = ref(1);
+let myExpectedPoint = ref(0);
+let enemyExpectedPoint = ref(0);
 let mySpPoint = ref(0);
 let enemySpPoint = ref(0);
-let myCount = ref(1);
-let enemyCount = ref(1);
-let myTempCount = ref(0);
-let enemyTempCount = ref(0);
 let tempMySpPoint = 0;
 let tempEnemySpPoint = 0;
 
@@ -206,10 +204,6 @@ function setCard(){
   changeTurnPhase('waitting')
   writeMyActData()
 }
-function changePlayerMode(mode){
-  if(playerMode.value == mode) mode = 'normal'
-  playerMode.value = mode
-}
 function rotateCard(){
   if(playerMode.value == 'pass') return
   let rotatedMap = utils.rotateArray(utils.splitArray(selectCard.value.map,8),8)
@@ -241,15 +235,15 @@ function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
   canPut.value = checkPutCard(cardMap,stageOffsetY,stageOffsetX,stage)
 
   if (canPut.value) {
-    tempStageMap.value = stageMap.value.map(value=>value)
-    tempStageMap.value = virtualStage.value.map((value, index) => {
-    return value == 8 ? tempStageMap.value[index]:virtualStage.value[index] });
-    myTempCount.value = tempStageMap.value.filter(value=> value==myBlock.sp || value==myBlock.normal).length-myCount.value
-    enemyTempCount.value = tempStageMap.value.filter(value=> value==enemyBlock.sp || value==enemyBlock.normal).length-enemyCount.value
+    let tempStageMap = stageMap.value
+    tempStageMap = game.mergeStage(tempStageMap,virtualStage.value)
+
+    myExpectedPoint.value = game.countPoint([myBlock.normal,myBlock.sp,myBlock.fireSp], tempStageMap) - myPoint.value
+    enemyExpectedPoint.value = game.countPoint([enemyBlock.normal,enemyBlock.sp,enemyBlock.fireSp], tempStageMap) - enemyPoint.value
   }
   else {
-    myTempCount.value = 0
-    enemyTempCount.value = 0
+    myExpectedPoint.value = 0
+    enemyExpectedPoint.value = 0
   }
 }
 
@@ -268,11 +262,15 @@ function updataTurn(){
   showDown()
 
   setTimeout(() => {
-    countPoint()
-    countSp()
+    stageMap.value = game.putFireToBlock(stageMap.value, myBlock, enemyBlock)
+    
+    myPoint.value = game.countPoint([myBlock.normal,myBlock.sp,myBlock.fireSp],stageMap.value)
+    enemyPoint.value = game.countPoint([enemyBlock.normal,enemyBlock.sp,enemyBlock.fireSp],stageMap.value)
+    mySpPoint.value = game.countPoint([myBlock.fireSp],stageMap.value) + tempMySpPoint
+    enemySpPoint.value = game.countPoint([enemyBlock.fireSp],stageMap.value) + tempEnemySpPoint
+
     setTimeout(()=>{
       if(gameTurn.value > 12) gameEnd()
-      // if(gameTurn.value > 1) gameEnd()
       else startTurn()
     },1500);
   }, 1500);
@@ -285,7 +283,6 @@ function startTurn(){
 }
 function gameEnd(){
   changeTurnPhase('gameEnd')
-  changePlayerMode('gameEnd');
 }
 function showDown(){
   virtualStage.value = store.state.ms_stage[0].map
@@ -306,69 +303,25 @@ function showDown(){
   if (store.state.enemyActData.type == 'pass') enemyEvaluation-=5
 
   if (myEvaluation == enemyEvaluation) {
-    let temp = mergeCard(myStage,enemyStage)
-    stageMap.value = mergeStage(stageMap.value,temp)
+    let temp = game.mergeCard(myStage,enemyStage)
+    stageMap.value = game.mergeStage(stageMap.value,temp)
   }
   else if (myEvaluation > enemyEvaluation) {
-    stageMap.value = mergeStage(stageMap.value,enemyStage)
+    stageMap.value = game.mergeStage(stageMap.value,enemyStage)
     setTimeout(() => {
-      stageMap.value = mergeStage(stageMap.value,myStage)
+      stageMap.value = game.mergeStage(stageMap.value,myStage)
     }, 1000);
   }
   else if (myEvaluation < enemyEvaluation) {
-    stageMap.value = mergeStage(stageMap.value,myStage)
+    stageMap.value = game.mergeStage(stageMap.value,myStage)
     setTimeout(()=>{
-      stageMap.value = mergeStage(stageMap.value,enemyStage)
+      stageMap.value = game.mergeStage(stageMap.value,enemyStage)
     }, 1000)
   }
 }
-function mergeStage(original,target) {
-  return target.map((value, index) => {
-    if (spBlock.some(el => el == original[index]) && normalBlock.some(el => el == value)) return original[index]
-    return value == 8 ? original[index] : target[index]
-  });
-}
-function mergeCard(card1,card2) {
-  // cardにはそれぞれ1,3 2,4 8 が入ってる
-  return card1.map((value, index) => {
-    if (value == 8 && card2[index] != 8) return card2[index]
-    else if (value != 8 && card2[index] == 8) return value
-
-    //ここで通常マス(1,2)とSPマス(3,4)それぞれをぶつけてる
-    if (spBlock.some(el => el == value) && spBlock.some(el => el == card2[index]) == spBlock.some(el => el == value)) return 7
-    else if (normalBlock.some(el => el == value) && normalBlock.some(el => el == card2[index]) == normalBlock.some(el => el == value)) return 7
-
-    //ここで比較がでるのは通常マスとSPマスのみ
-    else if (value > card2[index]) return value
-    else if (value < card2[index]) return card2[index]
-    else return value
-  })
-}
-function countPoint(){
-  myCount.value = stageMap.value.filter(value=> value==myBlock.sp || value==myBlock.normal).length
-  enemyCount.value = stageMap.value.filter(value=> value==enemyBlock.sp || value==enemyBlock.normal).length
-}
-function countSp(){
-  const stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
-  stageMap.value = stageMap.value.map((value,index)=>{
-    const stagePosY = Math.floor(index / store.state.stageSideLength)
-    const stagePosX = index%store.state.stageSideLength
-    if(value == myBlock.sp){
-      if( utils.serchAroundAll([1,2,3,4,5,6,7,8], stagePosY, stagePosX, stage) ) return myBlock.fireSp
-      else return value
-    }
-    else if(value == enemyBlock.sp){
-      if( utils.serchAroundAll([1,2,3,4,5,6,7,8], stagePosY, stagePosX, stage) ) return enemyBlock.fireSp
-      else return value
-    }
-    else return value
-  })
-  mySpPoint.value = stageMap.value.filter(value=> value==myBlock.fireSp).length + tempMySpPoint
-  enemySpPoint.value = stageMap.value.filter(value=> value==enemyBlock.fireSp).length + tempEnemySpPoint
-}
 
 function draw(){
-  let drawCard = useDeck.value[gameTurn.value+2];
+  let drawCard = myDeck.value[gameTurn.value+2];
   usedCard.value.push(drawCard);
   hand.value.splice(selectCardIndex.value,1,drawCard);
   useHand.value.updata(hand.value);
@@ -390,53 +343,6 @@ function checkPlayHand(hand){
     }
   });
 }
-
-function changeTurnPhase(mode){
-  turnPhase.value = mode
-}
-
-function writeMyActData(){
-  store.state.myActData = { turn: gameTurn.value, type: playerMode.value, card: selectCard.value, virtualStage: virtualStage.value }
-
-  store.state.roomDocRef.get().then((doc) => {
-    let gameDatas = doc.get("gameDatas");
-    gameDatas = {...gameDatas, [store.state.userId]: store.state.myActData }
-    store.state.roomDocRef.update({ gameDatas });
-  });
-}
-
-function loadMydeck(){
-  let deck = store.state.tb_deckList[store.state.currentDeck].deck;
-  myDeck.value = store.getters.findCardsById(deck);
-  if (store.state.myUserObj.userColor == 'blue') {
-    let blueDeck = replaceToBlue(myDeck.value)
-    myDeck.value = blueDeck
-  }
-}
-function replaceToBlue(cardList) {
-  return cardList.map(card => { let blueMap = card.map.map(value => {
-    if (value != 0) return value + 1
-    return value;
-    })
-    return { ...card, map: blueMap }
-  });
-}
-function setMyBlock(){
-  return store.state.myUserObj.userColor == 'blue' ? {normal:2,sp:4,fireSp:6}:{normal:1,sp:3,fireSp:5}
-}
-function setEnemyBlock(){
-  return store.state.enemyUserObj.userColor == 'yellow' ? {normal:1,sp:3,fireSp:5}:{normal:2,sp:4,fireSp:6}
-}
-function firestDraw(){
-  let tempHand = [];
-  useDeck.value = utils.shuffleArray(myDeck.value)
-  for (let i = 0; i < 4; i++) {
-    tempHand.push(useDeck.value[i])
-    usedCard.value.push(useDeck.value[i])
-  }
-  hand.value = tempHand
-}
-
 function checkPutCard (cardMap, stageOffsetY,stageOffsetX,stage){
   let aroundResult =[]
   for (let y = 0; y < 8; y++) {
@@ -454,6 +360,42 @@ function checkPutCard (cardMap, stageOffsetY,stageOffsetX,stage){
     }
   }
   return aroundResult.some(value => value)
+}
+
+function changeTurnPhase(mode){
+  turnPhase.value = mode
+}
+function changePlayerMode(mode){
+  if(playerMode.value == mode) mode = 'normal'
+  playerMode.value = mode
+}
+
+function writeMyActData(){
+  store.state.myActData = { turn: gameTurn.value, type: playerMode.value, card: selectCard.value, virtualStage: virtualStage.value }
+
+  store.state.roomDocRef.get().then((doc) => {
+    let gameDatas = doc.get("gameDatas");
+    gameDatas = {...gameDatas, [store.state.userId]: store.state.myActData }
+    store.state.roomDocRef.update({ gameDatas });
+  });
+}
+
+function loadMydeck(){
+  let deck = store.state.tb_deckList[store.state.currentDeck].deck;
+  myDeck.value = store.getters.findCardsById(deck);
+  if (store.state.myUserObj.userColor == 'blue') {
+    myDeck.value = game.replaceToBlue(myDeck.value)
+  }
+}
+
+function firestDraw(){
+  let tempHand = [];
+  myDeck.value = utils.shuffleArray(myDeck.value)
+  for (let i = 0; i < 4; i++) {
+    tempHand.push(myDeck.value[i])
+    usedCard.value.push(myDeck.value[i])
+  }
+  hand.value = tempHand
 }
 </script>
 
