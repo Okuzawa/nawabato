@@ -27,7 +27,7 @@ import src_orange_fire from "@/assets/image/blocks/orange_fire_block.png";
 import src_blue from "@/assets/image/blocks/blue_block.png";
 import src_sky from "@/assets/image/blocks/sky_block.png";
 import src_sky_fire from "@/assets/image/blocks/sky_fire_block.png";
-import src_default from "@/assets/image/blocks/default_block.png";
+import src_default from "@/assets/image/blocks/default.png";
 import src_null from "@/assets/image/blocks/null_block.png";
 // import src_null from "@/assets/image/blocks/frame_black.png";
 

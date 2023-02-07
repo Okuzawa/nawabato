@@ -10,7 +10,9 @@
             {{store.state.stageObj.name}}
           </button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-            <li v-for="(value, key, index) in store.state.ms_stage" :key="index"><a class="dropdown-item" @click="selectStage(key)">{{value.name}}</a></li>
+            <li v-for="(value, key, index) in store.state.ms_stage" :key="index">
+              <a v-if="value.id > 0" class="dropdown-item" @click="selectStage(key)">{{value.name}}</a>
+            </li>
           </ul>
         </div>
       </div>

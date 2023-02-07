@@ -1,8 +1,4 @@
 <template>
-  <div v-if="gameTurn > 0">
-  <h2>残り{{13-gameTurn}}ターン</h2>
-  </div>
-
   <div id="overlay" v-show="showContent">
     <div id="content">
       <div class="modal-body">
@@ -23,29 +19,25 @@
     </div>
   </div>
 
-  <div id="overlay" v-show="turnPhase == 'gameEnd'">
-    <div id="content">
-      <div class="modal-body">
-        <div id="top-list">
-          <div><h3>結果</h3></div>
-          <div>
-            <h2>{{store.state.myUserObj.userName}}:{{myCount}} VS {{store.state.enemyUserObj.userName}}:{{enemyCount}}</h2>
-          </div>
-        </div>
-      </div>
-      <div>
-        <button type="button" class="btn btn-secondary transitionBtn" @click="store.commit('eraseBufRoom')">
-          <p>退室する</p>
-        </button>
-      </div>
+  <div v-if="gameTurn > 0 && turnPhase != 'gameEnd'">
+    <h2>残り{{13-gameTurn}}ターン</h2>
+  </div>
+
+  <div v-if="turnPhase == 'gameEnd'">
+    <div>
+      <h3>結果</h3>
+    </div>
+    <div>
+      <h2>{{store.state.myUserObj.userName}}:{{myCount}} VS {{store.state.enemyUserObj.userName}}:{{enemyCount}}</h2>
     </div>
   </div>
   
   <div class="controller">
-    <GameHand class="hand" ref="useHand" :deck="hand" :canPlay ="canPlay" @pick="PickUpCard"/>
+    <GameHand class="hand" ref="useHand" :deck="hand" :canPlay ="canPlayCard" @pick="PickUpCard"/>
     <button v-if="turnPhase == 'play'" @click="changePlayerMode('pass')">パス</button>
-    <button v-if="turnPhase == 'play'" @click="changePlayerMode('sp')">SP発動{{playerMode == 'sp'?'ON':'OFF'}}</button>
+    <button v-if="turnPhase == 'play'" :class="{ gaming: playerMode == 'sp' }" @click="changePlayerMode('sp')">SP発動</button>
     <button v-if="turnPhase == 'play'" @click="rotateCard">回転</button>
+    <button v-if="turnPhase == 'gameEnd'" @click="store.commit('eraseBufRoom')">退室する</button>
     <GameDeck :deck="myDeck" :usedCard="usedCard"/>
   </div>
 
@@ -115,8 +107,8 @@ import CardSleeve from "@/components/parts/CardSleeve.vue";
 const useHand = ref();
 const myBlock = setMyBlock()
 const enemyBlock = setEnemyBlock()
-const targetNormal = [1, 2]
-const targetSp = [3, 4]
+const normalBlock = [1, 2]
+const spBlock = [3, 4]
 const showContent = ref(false);
 const showEnemyCard = ref(false);
 const showMyCard = ref(true);
@@ -133,7 +125,7 @@ let myDeck = ref([]);
 let useDeck = ref([]);
 let usedCard = ref([])
 let hand = ref([]);
-let canPlay = ref([]);
+let canPlayCard = ref([]);
 let playerMode = ref("");
 let turnPhase = ref("")
 
@@ -177,7 +169,7 @@ function Mulligan(){
 }
 
 watch(playerMode,(cr)=>{
-  canPlay.value = [];
+  canPlayCard.value = [];
   switch (cr) {
     case 'normal':
       selectCard.value = store.state.ms_card[0]
@@ -190,8 +182,9 @@ watch(playerMode,(cr)=>{
       putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
       break;
     case 'pass':
-      canPlay.value = hand.value.map(value => value)
-      putCard(utils.splitArray(store.state.ms_card[0].map,8),posIndex.value,-3,-3)
+      selectCard.value = store.state.ms_card[0]
+      canPlayCard.value = hand.value.map(value => value)
+      putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
       break;
     default:
       break;
@@ -226,14 +219,13 @@ function rotateCard(){
 function PickUpCard(index){
   if(turnPhase.value != 'play') return
   selectCardIndex.value = index
-  if(-1 == canPlay.value.indexOf(hand.value[index])) return
+  if(-1 == canPlayCard.value.indexOf(hand.value[index])) return
   selectCard.value = hand.value[index]
   if(playerMode.value == 'pass') return
   putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
 }
 function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
   if(turnPhase.value != 'play') return
-  if(playerMode.value == 'pass') return
   let temp = utils.splitArray(store.state.ms_stage[0].map, store.state.stageSideLength)
   posIndex.value = _index
   let index = _index+offsetX+(offsetY*store.state.stageSideLength)
@@ -255,7 +247,10 @@ function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
     myTempCount.value = tempStageMap.value.filter(value=> value==myBlock.sp || value==myBlock.normal).length-myCount.value
     enemyTempCount.value = tempStageMap.value.filter(value=> value==enemyBlock.sp || value==enemyBlock.normal).length-enemyCount.value
   }
-  else myTempCount.value = 0
+  else {
+    myTempCount.value = 0
+    enemyTempCount.value = 0
+  }
 }
 
 function updataTurn(){
@@ -293,6 +288,7 @@ function gameEnd(){
   changePlayerMode('gameEnd');
 }
 function showDown(){
+  virtualStage.value = store.state.ms_stage[0].map
   let tempMap = utils.splitArray(store.state.enemyActData.virtualStage, store.state.stageSideLength)
   tempMap = utils.rotateArray(tempMap, store.state.stageSideLength)
   tempMap = utils.rotateArray(tempMap, store.state.stageSideLength)
@@ -328,7 +324,7 @@ function showDown(){
 }
 function mergeStage(original,target) {
   return target.map((value, index) => {
-    if (targetSp.some(el => el == original[index]) && targetNormal.some(el => el == value)) return original[index]
+    if (spBlock.some(el => el == original[index]) && normalBlock.some(el => el == value)) return original[index]
     return value == 8 ? original[index] : target[index]
   });
 }
@@ -339,8 +335,8 @@ function mergeCard(card1,card2) {
     else if (value != 8 && card2[index] == 8) return value
 
     //ここで通常マス(1,2)とSPマス(3,4)それぞれをぶつけてる
-    if (targetSp.some(el => el == value) && targetSp.some(el => el == card2[index]) == targetSp.some(el => el == value)) return 7
-    else if (targetNormal.some(el => el == value) && targetNormal.some(el => el == card2[index]) == targetNormal.some(el => el == value)) return 7
+    if (spBlock.some(el => el == value) && spBlock.some(el => el == card2[index]) == spBlock.some(el => el == value)) return 7
+    else if (normalBlock.some(el => el == value) && normalBlock.some(el => el == card2[index]) == normalBlock.some(el => el == value)) return 7
 
     //ここで比較がでるのは通常マスとSPマスのみ
     else if (value > card2[index]) return value
@@ -381,14 +377,14 @@ function draw(){
 
 function checkPlayHand(hand){
   let stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
-  hand.forEach((card) => {
-    if(playerMode.value == 'sp' && card.cost > mySpPoint.value) return
+  canPlayCard.value = hand.map((card) => {
+    if(playerMode.value == 'sp' && card.cost > mySpPoint.value) return;
     let cardMap = utils.splitArray(card.map,8)
-    for (let i = 0; i < 4; i++) {
-      let rotatedMap = utils.rotateArray(cardMap,8)
-      for (let y = 0; y < 26; y++) {
-        for(let x = 0; x < 26; x++){
-          if( checkPutCard(rotatedMap,y,x,stage)) { canPlay.value.push(card);return; }
+    for (let y = 0; y < store.state.stageSideLength-(8-1); y++) {
+      for(let x = 0; x < store.state.stageSideLength-(8-1); x++){
+        for(let i = 0; i<4; i++){
+          if( checkPutCard(cardMap,y,x,stage)) return card
+          cardMap = utils.rotateArray(cardMap,8)
         }
       }
     }
@@ -462,6 +458,14 @@ function checkPutCard (cardMap, stageOffsetY,stageOffsetX,stage){
 </script>
 
 <style lang="scss" scoped>
+.gaming {
+  background: linear-gradient(to right, rgba(255, 0, 255, 0.5), rgba(255, 255, 0, 0.5), rgba(0, 255, 255, 0.5), rgba(255, 0, 255, 0.5)) 0% center/200%;
+  animation: gaming 2s linear infinite;
+  }
+@keyframes gaming {
+  100% { background-position-x: 200%; }
+}
+
 .container{
   display: flex;
   justify-content: center;
