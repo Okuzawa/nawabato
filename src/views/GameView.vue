@@ -458,7 +458,7 @@ function firestDraw(){
       justify-content: center;
     }
     .gray{
-      filter: opacity(50%) grayscale(100%);
+      filter: opacity(50%) sepia(100%);
     }
     .tempFix{
       filter: opacity(100%);
