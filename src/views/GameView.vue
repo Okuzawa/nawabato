@@ -392,7 +392,7 @@ function loadMydeck(){
 
 function firestDraw(){
   let tempHand = [];
-  myDeck.value = utils.shuffleArray(myDeck.value)
+  myDeck.value = utils.shuffleArray(deck.value)
   for (let i = 0; i < 4; i++) {
     tempHand.push(myDeck.value[i])
     usedCard.value.push(myDeck.value[i])
