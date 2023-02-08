@@ -321,10 +321,10 @@ function showDown(){
 
   let myEvaluation = 0
   let enemyEvaluation = 0
-  if (selectCard.value.count < enemySelectCard.value.count) myEvaluation++
-  else if (selectCard.value.count > enemySelectCard.value.count) myEvaluation--
-  if (store.state.myActData.type == 'sp' && store.state.enemyActData.type == 'normal') myEvaluation+=2
-  else if (store.state.myActData.type == 'normal' && store.state.enemyActData.type == 'sp') myEvaluation-=2
+  if (selectCard.value.count < enemySelectCard.value.count) myEvaluation+=2
+  else if (selectCard.value.count > enemySelectCard.value.count) myEvaluation-=2
+  if (store.state.myActData.type == 'sp' && store.state.enemyActData.type == 'normal') myEvaluation++
+  else if (store.state.myActData.type == 'normal' && store.state.enemyActData.type == 'sp') myEvaluation--
   if (store.state.myActData.type == 'pass') myEvaluation-=5
   if (store.state.enemyActData.type == 'pass') enemyEvaluation-=5
 
