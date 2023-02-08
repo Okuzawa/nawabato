@@ -38,7 +38,7 @@
     <button v-if="turnPhase == 'play'" :class="{ gaming: playerMode == 'sp' }" @click="changePlayerMode('sp')">SP発動</button>
     <button v-if="turnPhase == 'play'" @click="rotateCard">回転</button>
     <button v-if="turnPhase == 'gameEnd'" @click="store.commit('eraseBufRoom')">退室する</button>
-    <GameDeck :deck="myDeck" :usedCard="usedCard"/>
+    <GameDeck :deck="deck" :usedCard="usedCard"/>
   </div>
 
   <div class="container">
@@ -112,6 +112,7 @@ const enemyBlock = game.setBlock(store.state.enemyUserObj.userColor)
 const showContent = ref(false);
 const showEnemyCard = ref(false);
 const showMyCard = ref(true);
+const deck = ref([]);
 
 let gameTurn = ref(0);
 let stageMap = ref(store.state.stageObj.map);
@@ -381,11 +382,12 @@ function writeMyActData(){
 }
 
 function loadMydeck(){
-  let deck = store.state.tb_deckList[store.state.currentDeck].deck;
-  myDeck.value = store.getters.findCardsById(deck);
+  let idList = store.state.tb_deckList[store.state.currentDeck].deck;
+  myDeck.value = store.getters.findCardsById(idList);
   if (store.state.myUserObj.userColor == 'blue') {
     myDeck.value = game.replaceToBlue(myDeck.value)
   }
+  deck.value = myDeck.value
 }
 
 function firestDraw(){
