@@ -62,9 +62,16 @@ function replaceToBlue(cardList) {
     });
 }
 
+function replaceToYellow(cardList) {
+    return cardList.map(card => {
+        return { ...card }
+    });
+}
+
 export default {
     setBlock,
     replaceToBlue,
+    replaceToYellow,
     mergeCard,
     mergeStage,
     countPoint,

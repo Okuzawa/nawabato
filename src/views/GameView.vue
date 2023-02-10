@@ -45,7 +45,7 @@
     <div class="stage">
       <div>
         <BlockTable class="viewStage" :contents="utils.splitArray(stageMap, store.state.stageSideLength)" />
-        <BlockTable class="virtualStage" :class="{ gray: !canPut }"
+        <BlockTable class="virtualStage" :hide="true" :gray="!canPut"
         :contents="utils.splitArray(virtualStage, store.state.stageSideLength)" 
         :selectCard="utils.splitArray(selectCard.map, 8)" @pick="putCard"/>
         <div class="panel" v-if="playerMode == 'pass' && turnPhase == 'play'">
@@ -321,12 +321,8 @@ function showDown(){
 
   let myEvaluation = 0
   let enemyEvaluation = 0
-  if (selectCard.value.count < enemySelectCard.value.count) myEvaluation+=2
-  else if (selectCard.value.count > enemySelectCard.value.count) myEvaluation-=2
-  if (store.state.myActData.type == 'sp' && store.state.enemyActData.type == 'normal') myEvaluation++
-  else if (store.state.myActData.type == 'normal' && store.state.enemyActData.type == 'sp') myEvaluation--
-  if (store.state.myActData.type == 'pass') myEvaluation-=5
-  if (store.state.enemyActData.type == 'pass') enemyEvaluation-=5
+  if (selectCard.value.count < enemySelectCard.value.count) myEvaluation++
+  else if (selectCard.value.count > enemySelectCard.value.count) myEvaluation--
 
   if (myEvaluation == enemyEvaluation) {
     let temp = game.mergeCard(myStage,enemyStage)
@@ -400,8 +396,9 @@ function writeMyActData(){
 
 function loadMydeck(){
   let idList = store.state.tb_deckList[store.state.currentDeck].deck;
-  myDeck.value = store.getters.findCardsById(idList);
-  if (store.state.myUserObj.userColor == 'blue') myDeck.value = game.replaceToBlue(myDeck.value)
+  let deck = store.getters.findCardsById(idList);
+  if (store.state.myUserObj.userColor == 'blue') myDeck.value = game.replaceToBlue(deck)
+  else myDeck.value = game.replaceToYellow(deck)
 }
 
 function firestDraw(){
@@ -482,7 +479,7 @@ function draw(){
     .virtualStage{
       margin-top: -1088px;
       z-index: 1;
-      filter: opacity(50%);
+      // filter: opacity(50%);
     }
     .panel{
       position: fixed;
@@ -496,9 +493,9 @@ function draw(){
       align-items: center;
       justify-content: center;
     }
-    .gray{
-      filter: opacity(50%) sepia(100%);
-    }
+    // .gray{
+    //   filter: opacity(50%) sepia(100%);
+    // }
   }
 }
 .controller{
