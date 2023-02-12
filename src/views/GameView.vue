@@ -93,6 +93,12 @@
       </CardFlip>
     </div>
   </div>
+  <div class="gaming cutIn" :class="{hide: !enemyCutIn}">
+    <h4 id="enemySpAtc" :class="(store.state.enemyUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">スペシャルアタック!!</h4>
+  </div>
+  <div class="gaming cutIn" :class="{hide: !myCutIn}">
+    <h4 id="mySpAtc" :class="(store.state.myUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">スペシャルアタック!!</h4>
+  </div>
 </template>
 
 <script setup scoped>
@@ -141,6 +147,9 @@ const mySpPoint = ref(0);
 const enemySpPoint = ref(0);
 let tempMySpPoint = 0;
 let tempEnemySpPoint = 0;
+
+const myCutIn = ref(false)
+const enemyCutIn = ref(false)
 
 function init(){
   loadMydeck()
@@ -259,19 +268,30 @@ const wait = function (seconds) {
     });
 };
 function updataTurn(){
-  showMyCard.value = true
-  showEnemyCard.value = true
   myExpectedPoint.value = myPoint.value
   enemyExpectedPoint.value = enemyPoint.value
   
-  if(store.state.myActData.type == 'sp') tempMySpPoint -= selectCard.value.cost
-  if(store.state.enemyActData.type == 'sp') tempEnemySpPoint -= enemySelectCard.value.cost
-  showDown()
+  if(store.state.myActData.type == 'sp') {
+    tempMySpPoint -= selectCard.value.cost
+    myCutIn.value = true
+  }
+  if(store.state.enemyActData.type == 'sp') {
+    tempEnemySpPoint -= enemySelectCard.value.cost
+    enemyCutIn.value = true
+  }
 
-  wait(2)
+  wait(1)
+  .then(() => {
+    enemyCutIn.value = false
+    myCutIn.value = false
+    showEnemyCard.value = true
+    showMyCard.value = true
+    showDown()
+    return wait(1.5);
+    })
   .then(() => {
     stageMap.value = game.putFireToBlock(stageMap.value, myBlock, enemyBlock)
-    return wait(1);
+    return wait(0.5);
     })
   .then(() => {
     if(store.state.myActData.type == 'pass') tempMySpPoint++
@@ -294,7 +314,7 @@ function updataTurn(){
     enemyExpectedPoint.value = enemyPoint.value
     
     gameTurn.value++
-    return wait(1);
+    return wait(0.5);
     })
   .then(() => {
     if(gameTurn.value > 12) gameEnd()
@@ -421,14 +441,28 @@ function draw(){
 </script>
 
 <style lang="scss" scoped>
-.gaming {
-  background: linear-gradient(to right, rgba(255, 0, 255, 0.5), rgba(255, 255, 0, 0.5), rgba(0, 255, 255, 0.5), rgba(255, 0, 255, 0.5)) 0% center/200%;
-  animation: gaming 2s linear infinite;
-  }
-@keyframes gaming {
-  100% { background-position-x: 200%; }
+.yellow{
+  color: orange
 }
-
+.blue{
+  color: blue
+}
+.cutIn{
+  pointer-events: none;
+}
+.hide{
+  filter: opacity(0%);
+}
+#mySpAtc{
+  margin-top: 50px;
+  z-index: 3;
+  position: relative;
+}
+#enemySpAtc{
+  margin-top: -600px;
+  z-index: 3;
+  position: relative;
+}
 .container{
   display: flex;
   justify-content: center;
@@ -459,12 +493,6 @@ function draw(){
           margin-left: 50px;
         }
       }
-      .yellow{
-        color: orange
-      }
-      .blue{
-        color: blue
-      }
       .enemyCard{
         pointer-events: none;
       }
@@ -479,7 +507,6 @@ function draw(){
     .virtualStage{
       margin-top: -1088px;
       z-index: 1;
-      // filter: opacity(50%);
     }
     .panel{
       position: fixed;
@@ -493,9 +520,6 @@ function draw(){
       align-items: center;
       justify-content: center;
     }
-    // .gray{
-    //   filter: opacity(50%) sepia(100%);
-    // }
   }
 }
 .controller{
@@ -535,5 +559,13 @@ function draw(){
 }
 #top-list {
   margin: 0px -100px;
+}
+
+.gaming {
+  background: linear-gradient(to right, rgba(255, 0, 255, 0.5), rgba(255, 255, 0, 0.5), rgba(0, 255, 255, 0.5), rgba(255, 0, 255, 0.5)) 0% center/200%;
+  animation: gaming 2s linear infinite;
+  }
+@keyframes gaming {
+  100% { background-position-x: 200%; }
 }
 </style>
