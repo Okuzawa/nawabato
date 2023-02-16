@@ -3,8 +3,11 @@
     <div id="content">
       <div class="modal-body">
         <div id="top-list">
+          <p>手札のカードを引き直しますか？</p>
           <div class="container">
-            手札のカードを引き直しますか？
+            <div v-for="(value, key, index) in hand" :key="index">
+              <CardItem class="pointerNone showHand" :id="value.id" :name="value.name" :count="value.count" :cost="value.cost" :map="value.map"/>
+            </div>
           </div>
         </div>
       </div>
@@ -57,7 +60,7 @@
       </div>
     </div>
     <div class="playerData">
-      <CardFlip class="enemyCard" :isFaceUp="showEnemyCard">
+      <CardFlip class="pointerNone" :isFaceUp="showEnemyCard">
         <template #face>
           <CardItem :id="enemySelectCard.id" :name="enemySelectCard.name" 
           :count="enemySelectCard.count" :cost="enemySelectCard.cost" :map="enemySelectCard.map"
@@ -93,10 +96,10 @@
       </CardFlip>
     </div>
   </div>
-  <div class="gaming cutIn" :class="{hide: !enemyCutIn}">
+  <div class="gaming pointerNone" :class="{hide: !enemyCutIn}">
     <h4 id="enemySpAtc" :class="(store.state.enemyUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">スペシャルアタック!!</h4>
   </div>
-  <div class="gaming cutIn" :class="{hide: !myCutIn}">
+  <div class="gaming pointerNone" :class="{hide: !myCutIn}">
     <h4 id="mySpAtc" :class="(store.state.myUserObj.userColor === 'yellow') ? 'yellow' : 'blue'">スペシャルアタック!!</h4>
   </div>
 </template>
@@ -447,9 +450,6 @@ function draw(){
 .blue{
   color: blue
 }
-.cutIn{
-  pointer-events: none;
-}
 .hide{
   filter: opacity(0%);
 }
@@ -493,9 +493,6 @@ function draw(){
           margin-left: 50px;
         }
       }
-      .enemyCard{
-        pointer-events: none;
-      }
     }
     .stage {
       margin-top: -50px;
@@ -533,6 +530,13 @@ function draw(){
     height: 150px;
     transform: scale(0.75);
   }
+}
+.pointerNone{
+  pointer-events: none;
+}
+.showHand{
+  margin:0;padding:0;
+  transform: scale(0.75);
 }
 
 #overlay {
