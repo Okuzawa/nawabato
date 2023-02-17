@@ -68,6 +68,27 @@ function replaceToYellow(cardList) {
     });
 }
 
+function movePosIndex(direction) {
+    let moveIndex = 0;
+    switch (direction) {
+        case "←":
+            moveIndex = -1;
+            break;
+        case "→":
+            moveIndex = +1;
+            break;
+        case "↑":
+            moveIndex = -store.state.stageSideLength;
+            break;
+        case "↓":
+            moveIndex = +store.state.stageSideLength;
+            break;
+        default:
+            break;
+    }
+    return moveIndex;
+}
+
 export default {
     setBlock,
     replaceToBlue,
@@ -76,4 +97,5 @@ export default {
     mergeStage,
     countPoint,
     putFireToBlock,
+    movePosIndex,
 };

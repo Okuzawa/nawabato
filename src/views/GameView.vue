@@ -42,6 +42,12 @@
     <button v-if="turnPhase == 'play'" @click="rotateCard">回転</button>
     <button v-if="turnPhase == 'gameEnd'" @click="store.commit('eraseBufRoom')">退室する</button>
     <GameDeck :deck="myDeck" :usedCard="usedCard"/>
+    <div v-if="turnPhase == 'play'">
+      <button class="btn btn-outline-secondary" @click="move('←')">←</button>
+      <button class="btn btn-outline-secondary" @click="move('→')">→</button>
+      <button class="btn btn-outline-secondary" @click="move('↑')">↑</button>
+      <button class="btn btn-outline-secondary" @click="move('↓')">↓</button>
+    </div>
   </div>
 
   <div class="container">
@@ -228,6 +234,11 @@ function rotateCard(){
   selectCard.value.map = rotatedMap.flat()
   putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
 }
+function move(direction){
+  if(playerMode.value == 'pass') return
+  posIndex.value += game.movePosIndex(direction)
+  putCard(utils.splitArray(selectCard.value.map,8),posIndex.value,-3,-3)
+}
 function PickUpCard(index){
   if(turnPhase.value != 'play') return
   selectCardIndex.value = index
@@ -238,17 +249,27 @@ function PickUpCard(index){
 }
 function putCard(cardMap, _index, offsetX = 0, offsetY = 0){
   if(turnPhase.value != 'play') return
-  let temp = utils.splitArray(store.state.ms_stage[0].map, store.state.stageSideLength)
+  let tempMap = utils.splitArray(store.state.ms_stage[0].map, store.state.stageSideLength)
   posIndex.value = _index
   let index = _index+offsetX+(offsetY*store.state.stageSideLength)
-  const stageOffsetY = Math.floor(index / store.state.stageSideLength)
-  const stageOffsetX = index%store.state.stageSideLength
+  let stageOffsetY = Math.floor(index / store.state.stageSideLength)
+  let stageOffsetX = index%store.state.stageSideLength
+  let tempValue = 34-(8-1)
+  if(stageOffsetY > tempValue) {
+    stageOffsetY = 0
+    posIndex.value = _index-(tempValue*store.state.stageSideLength)
+  }
+  if(stageOffsetY < 0) {
+    stageOffsetY = tempValue
+    posIndex.value = _index+( (tempValue) *store.state.stageSideLength)
+  }
+  
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
-      if(cardMap[y][x] != 0) temp[y+stageOffsetY][x+stageOffsetX]=cardMap[y][x]
+      if(cardMap[y][x] != 0) tempMap[y+stageOffsetY][x+stageOffsetX]=cardMap[y][x]
     }
   }
-  virtualStage.value = temp.flat()
+  virtualStage.value = tempMap.flat()
   const stage = utils.splitArray(stageMap.value,store.state.stageSideLength)
   canPut.value = checkPutCard(cardMap,stageOffsetY,stageOffsetX,stage)
 
