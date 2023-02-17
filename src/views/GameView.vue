@@ -44,9 +44,9 @@
     <GameDeck :deck="myDeck" :usedCard="usedCard"/>
     <div v-if="turnPhase == 'play'">
       <button class="btn btn-outline-secondary" @click="move('←')">←</button>
-      <button class="btn btn-outline-secondary" @click="move('→')">→</button>
       <button class="btn btn-outline-secondary" @click="move('↑')">↑</button>
       <button class="btn btn-outline-secondary" @click="move('↓')">↓</button>
+      <button class="btn btn-outline-secondary" @click="move('→')">→</button>
     </div>
   </div>
 
