@@ -159,6 +159,7 @@ let tempEnemySpPoint = 0;
 
 const myCutIn = ref(false)
 const enemyCutIn = ref(false)
+let isLoading = false;
 
 function init(){
   loadMydeck()
@@ -213,6 +214,7 @@ watch(playerMode,(cr)=>{
 })
 watch(()=>store.state.gameDatas,(cr)=>{
   store.state.enemyActData = cr[store.state.enemyUserObj.userId]
+  if(isLoading) return;
   if( store.state.myActData.turn==store.state.enemyActData.turn ){
     enemySelectCard.value = store.state.enemyActData.card
     changeTurnPhase('show')
@@ -227,6 +229,16 @@ function setCard(){
   showMyCard.value = false
   changeTurnPhase('waitting')
   writeMyActData()
+  setTimeout(() => writeMyActData(), 500);
+}
+function writeMyActData(){
+  store.state.myActData = { turn: gameTurn.value, type: playerMode.value, card: selectCard.value, virtualStage: virtualStage.value }
+
+  store.state.roomDocRef.get().then((doc) => {
+    let gameDatas = doc.get("gameDatas");
+    gameDatas = {...gameDatas, [store.state.userId]: store.state.myActData }
+    store.state.roomDocRef.update({ gameDatas });
+  });
 }
 function rotateCard(){
   if(playerMode.value == 'pass') return
@@ -292,6 +304,7 @@ const wait = function (seconds) {
     });
 };
 function updataTurn(){
+  isLoading = true
   myExpectedPoint.value = myPoint.value
   enemyExpectedPoint.value = enemyPoint.value
   
@@ -343,6 +356,7 @@ function updataTurn(){
   .then(() => {
     if(gameTurn.value > 12) gameEnd()
     else startTurn()
+    isLoading = false;
     });
 }
 function startTurn(){
@@ -426,16 +440,6 @@ function changeTurnPhase(mode){
 function changePlayerMode(mode){
   if(playerMode.value == mode) mode = 'normal'
   playerMode.value = mode
-}
-
-function writeMyActData(){
-  store.state.myActData = { turn: gameTurn.value, type: playerMode.value, card: selectCard.value, virtualStage: virtualStage.value }
-
-  store.state.roomDocRef.get().then((doc) => {
-    let gameDatas = doc.get("gameDatas");
-    gameDatas = {...gameDatas, [store.state.userId]: store.state.myActData }
-    store.state.roomDocRef.update({ gameDatas });
-  });
 }
 
 function loadMydeck(){
