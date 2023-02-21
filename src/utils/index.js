@@ -40,23 +40,24 @@ function rotateArray(array, part) {
     return rotatedMap
 }
 
-function serchAround(values, posY, posX, targetArea) {
+function searchAround(values, posY, posX, targetArea) {
     for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {
-            if (values.some(value => value == targetArea[(posY - 1) + y][(posX - 1) + x])) return true
+            if (y == 1 && x == 1) continue
+            if (values.includes(targetArea[posY + y - 1][posX + x - 1])) return true
         }
     }
-    return false
+    return false;
 }
-function serchAroundAll(values, posY, posX, targetArea) {
-    let result = []
+function searchAroundAll(values, posY, posX, targetArea) {
+    let results = [];
     for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {
-            if (values.some(value => value == targetArea[(posY - 1) + y][(posX - 1) + x])) result.push(true)
-            else result.push(false)
+            if (y == 1 && x == 1) continue
+            results.push(values.includes(targetArea[posY + y - 1][posX + x - 1]));
         }
     }
-    return result.every(value=>value)
+    return !results.includes(false);
 }
 
 export default {
@@ -65,6 +66,6 @@ export default {
     splitArray,
     shuffleArray,
     rotateArray,
-    serchAround,
-    serchAroundAll,
+    searchAround,
+    searchAroundAll,
 };

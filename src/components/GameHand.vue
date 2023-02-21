@@ -11,7 +11,7 @@
           :block="store.state.blocks[1]"
           :sp_block="store.state.blocks[2]"
           @click="pickCard(key)"
-          :select="{ select: 0 <= canPlayCards.indexOf(value) ? false:true }"
+          :select="{ select: canPlayCards.includes(value) ? false:true }"
         />
       </div>
     </transition-group>

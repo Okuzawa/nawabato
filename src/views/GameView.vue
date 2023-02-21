@@ -422,11 +422,11 @@ function checkPutCard (cardMap, stageOffsetY,stageOffsetX,stage){
       if(cardMap[y][x] != 0){
         if(playerMode.value == 'sp'){
           if(stage[y+stageOffsetY][x+stageOffsetX] > 2) return false
-          aroundResult.push(utils.serchAround([myBlock.sp,myBlock.fireSp],y+stageOffsetY,x+stageOffsetX,stage))
+          aroundResult.push(utils.searchAround([myBlock.sp,myBlock.fireSp],y+stageOffsetY,x+stageOffsetX,stage))
         }
         else{
           if(stage[y+stageOffsetY][x+stageOffsetX] > 0) return false
-          aroundResult.push(utils.serchAround([myBlock.normal,myBlock.sp,myBlock.fireSp],y+stageOffsetY,x+stageOffsetX,stage))
+          aroundResult.push(utils.searchAround([myBlock.normal,myBlock.sp,myBlock.fireSp],y+stageOffsetY,x+stageOffsetX,stage))
         }
       } 
     }

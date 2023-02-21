@@ -16,7 +16,7 @@
                 :map="value.map"
                 :block="store.getters.getBlockSrc(1)"
                 :sp_block="store.getters.getBlockSrc(2)"
-                :select="{ select: 0 <= props.usedCard.indexOf(value) ? true:false }"
+                :select="{ select: props.usedCard.includes(value) ? true:false }"
               />
             </div>
           </div>

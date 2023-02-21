@@ -11,7 +11,7 @@
         :block="this.$store.getters.getBlockSrc(1)"
         :sp_block="this.$store.getters.getBlockSrc(2)"
         @click="change(value.id)"
-        :select="{ select: -1 != this.myDeck.indexOf(value) ? true:false }"
+        :select="{ select: this.myDeck.includes(value) ? true:false }"
       />
     </div>
   </div>

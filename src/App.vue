@@ -30,12 +30,6 @@ import src_sky_fire from "@/assets/image/blocks/sky_fire_block.png";
 import src_default from "@/assets/image/blocks/default.png";
 import src_null from "@/assets/image/blocks/null_block.png";
 // import src_null from "@/assets/image/blocks/frame_black.png";
-import src_yellow_stripe from "@/assets/image/blocks/yellow_stripe.png";
-import src_blue_stripe from "@/assets/image/blocks/blue_stripe.png";
-import src_orange_dot from "@/assets/image/blocks/orange_dot.png";
-import src_sky_dot from "@/assets/image/blocks/sky_dot.png";
-import src_stripe from "@/assets/image/blocks/stripe.png";
-import src_dot from "@/assets/image/blocks/dot.png";
 
 import LobbyView from "./views/LobbyView.vue";
 import HomeView from "./views/HomeView.vue";
@@ -53,12 +47,6 @@ function init() {
   store.commit("addBlockSrc", { src: src_sky_fire });
   store.commit("addBlockSrc", { src: src_default });
   store.commit("addBlockSrc", { src: src_null });
-  store.commit("addBlockSrc", { src: src_yellow_stripe });
-  store.commit("addBlockSrc", { src: src_blue_stripe });
-  store.commit("addBlockSrc", { src: src_orange_dot });
-  store.commit("addBlockSrc", { src: src_sky_dot });
-  store.commit("addBlockSrc", { src: src_stripe });
-  store.commit("addBlockSrc", { src: src_dot });
 
   store.dispatch("addCardListAsync");
   store.dispatch("addStageListAsync");
